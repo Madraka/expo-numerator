@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["ExpoNumeratorModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.numerator.ExpoNumeratorModule"]
+  }
+}
