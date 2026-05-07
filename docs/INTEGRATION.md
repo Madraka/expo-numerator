@@ -91,6 +91,7 @@ parse, typed errors, input, Expo integration, package metadata, and hardening.
 Run the example checks from the package root:
 
 ```sh
+npm run example:install
 npm run example:typecheck
 npm run example:doctor
 npm run example:expo-check

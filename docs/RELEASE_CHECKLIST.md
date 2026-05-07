@@ -19,6 +19,7 @@ npm run docs:check
 npm run skills:check
 npm run skills:install:check
 npm run benchmark:budget
+npm run example:install
 npm run example:typecheck
 npm run expo:check
 npm run example:expo-check
@@ -81,8 +82,11 @@ npm pack --dry-run
 
 ## GitHub Workflow
 
-- `CI` runs on pull requests and pushes to `main`/`master`. It installs with
-  `npm ci`, then runs lint, typecheck, Jest, and the full hardening gate.
+- `CI` runs on pull requests and pushes to `main`/`master`. It installs the root
+  package with `npm ci`, installs the example app with `npm run example:install`,
+  then runs lint, typecheck, Jest, and the full hardening gate.
+- GitHub workflows run on Node.js 22 LTS. This avoids the Node.js 20 EOL line
+  while staying inside Expo SDK 55's supported Node.js range.
 - `Release Candidate` is manually triggered with a `release_tag` input. It runs
   `npm run prepublishOnly`, emits machine-readable value/input/benchmark
   reports as artifacts, and performs an npm pack dry-run.

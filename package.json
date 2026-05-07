@@ -138,6 +138,7 @@
     "hardening": "npm run check:cldr-lite && npm run bundle:budget && npm run benchmark:budget && node scripts/check-public-api.js && node scripts/check-value-format-smoke.js && node scripts/check-arithmetic-smoke.js && node scripts/check-currency-registry.js && node scripts/check-unit-registry.js && node scripts/input-replay-smoke.js && node scripts/check-report-contracts.js && npm run docs:check && npm run showcase:contract && npm run skills:check && npm run skills:install:check && npm run example:typecheck && npm run example:doctor && npm run expo:check && npm run example:expo-check && npm run package:smoke && npm run release:check",
     "prepare": "expo-module prepare && node scripts/build-package-entrypoints.js",
     "prepublishOnly": "npm run clean && npm run build && npm run typecheck && npm test && npm run hardening",
+    "example:install": "npm --prefix example ci",
     "example:doctor": "npm --prefix example run doctor",
     "example:typecheck": "npm --prefix example run typecheck",
     "expo:check": "node scripts/check-expo-install.js root --allow-typescript-latest",

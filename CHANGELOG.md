@@ -129,6 +129,11 @@
   `docs/USAGE.md`, and `docs/INTEGRATION.md`, plus `npm run docs:check`.
 - Moved internal phase planning out of the public docs surface and added
   `docs/ROADMAP.md` plus gitignore rules for private planning notes.
+- Added explicit example app dependency installation to CI, release-candidate,
+  and publish workflows so Expo Router example typecheck passes in clean
+  checkout environments.
+- Updated GitHub Actions workflows from Node.js 20 to Node.js 22 LTS for the
+  Expo SDK 55 CI, release-candidate, and publish gates.
 - Added GitHub Actions CI, release-candidate validation, npm publish, and
   GitHub Release workflows with centralized release readiness checks.
 

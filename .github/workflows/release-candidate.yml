@@ -30,11 +30,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            example/package-lock.json
 
-      - name: Install dependencies
+      - name: Install package dependencies
         run: npm ci
+
+      - name: Install example dependencies
+        run: npm run example:install
 
       - name: Full release gate
         run: npm run prepublishOnly

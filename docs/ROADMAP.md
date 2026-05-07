@@ -30,6 +30,7 @@ under `docs/private/` or another ignored local path.
   light.
 - More public examples for real application workflows.
 - Continued package, bundle, benchmark, docs, and release hardening.
+- CI runtime maintenance on supported Node.js LTS lines for Expo SDK 55.
 
 ## Release Gates
 
