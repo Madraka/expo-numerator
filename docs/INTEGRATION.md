@@ -2,6 +2,15 @@
 
 This guide covers app integration patterns for Expo and React Native.
 
+## Install in an Expo App
+
+```sh
+npx expo install expo-numerator
+```
+
+Expo CLI uses the package manager for the project and validates compatible
+dependency versions for Expo/React Native projects.
+
 ## Expo Provider
 
 ```tsx

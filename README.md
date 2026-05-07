@@ -1,5 +1,13 @@
 # expo-numerator
 
+[![CI](https://github.com/Madraka/expo-numerator/actions/workflows/ci.yml/badge.svg)](https://github.com/Madraka/expo-numerator/actions/workflows/ci.yml)
+[![Publish](https://github.com/Madraka/expo-numerator/actions/workflows/publish.yml/badge.svg)](https://github.com/Madraka/expo-numerator/actions/workflows/publish.yml)
+[![npm version](https://img.shields.io/npm/v/expo-numerator.svg)](https://www.npmjs.com/package/expo-numerator)
+[![npm downloads](https://img.shields.io/npm/dm/expo-numerator.svg)](https://www.npmjs.com/package/expo-numerator)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-ready-3178c6.svg)](docs/API.md)
+[![Expo SDK 55](https://img.shields.io/badge/Expo%20SDK-55-000020.svg)](docs/INTEGRATION.md)
+
 Production-grade numeric infrastructure for Expo and React Native.
 
 `expo-numerator` provides string-first decimal, money, percent, unit,
@@ -7,6 +15,14 @@ formatting, parsing, and React Native input APIs without silent floating-point
 precision loss.
 
 ## Install
+
+For Expo apps, use Expo CLI:
+
+```sh
+npx expo install expo-numerator
+```
+
+For non-Expo npm workflows:
 
 ```sh
 npm install expo-numerator

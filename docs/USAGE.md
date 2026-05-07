@@ -3,6 +3,21 @@
 This guide shows the recommended consumer paths for common application
 workflows.
 
+## Install
+
+For Expo apps, use Expo CLI so dependency installation follows Expo's package
+manager and compatibility workflow:
+
+```sh
+npx expo install expo-numerator
+```
+
+For non-Expo npm workflows:
+
+```sh
+npm install expo-numerator
+```
+
 ## Locale-Bound Application Facade
 
 ```ts
