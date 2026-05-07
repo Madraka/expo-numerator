@@ -1,19 +1,18 @@
-import type { StyleProp, ViewStyle } from 'react-native';
+export type PlatformName = "ios" | "android" | "web" | "unknown";
 
-export type OnLoadEventPayload = {
-  url: string;
+export type PlatformInfo = {
+  platform: PlatformName;
+  moduleName: "ExpoNumeratorModule";
+  native: boolean;
 };
 
-export type ExpoNumeratorModuleEvents = {
-  onChange: (params: ChangeEventPayload) => void;
+export type NumberSeparators = {
+  decimal: string;
+  grouping: string;
 };
 
-export type ChangeEventPayload = {
-  value: string;
-};
-
-export type ExpoNumeratorModuleViewProps = {
-  url: string;
-  onLoad: (event: { nativeEvent: OnLoadEventPayload }) => void;
-  style?: StyleProp<ViewStyle>;
+export type ExpoNumeratorNativeModule = {
+  getPlatformInfo(): PlatformInfo;
+  getPreferredLocale(): string | null;
+  getNumberSeparators(locale?: string): NumberSeparators;
 };

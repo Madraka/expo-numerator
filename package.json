@@ -1,43 +1,189 @@
 {
-  "name": "my-module",
+  "name": "expo-numerator",
   "version": "0.1.0",
   "description": "Production-grade numeric infrastructure for Expo and React Native.",
-  "main": "build/index.js",
+  "main": "build/cjs/index.cjs",
+  "module": "build/esm/index.mjs",
   "types": "build/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "react-native": "./src/index.ts",
+      "import": "./build/esm/index.mjs",
+      "require": "./build/cjs/index.cjs",
+      "default": "./build/esm/index.mjs"
+    },
+    "./core": {
+      "types": "./build/core/index.d.ts",
+      "react-native": "./src/core/index.ts",
+      "import": "./build/esm/core/index.mjs",
+      "require": "./build/cjs/core/index.cjs",
+      "default": "./build/esm/core/index.mjs"
+    },
+    "./money": {
+      "types": "./build/money/index.d.ts",
+      "react-native": "./src/money/index.ts",
+      "import": "./build/esm/money/index.mjs",
+      "require": "./build/cjs/money/index.cjs",
+      "default": "./build/esm/money/index.mjs"
+    },
+    "./rounding": {
+      "types": "./build/rounding/index.d.ts",
+      "react-native": "./src/rounding/index.ts",
+      "import": "./build/esm/rounding/index.mjs",
+      "require": "./build/cjs/rounding/index.cjs",
+      "default": "./build/esm/rounding/index.mjs"
+    },
+    "./locale": {
+      "types": "./build/locale/index.d.ts",
+      "react-native": "./src/locale/index.ts",
+      "import": "./build/esm/locale/index.mjs",
+      "require": "./build/cjs/locale/index.cjs",
+      "default": "./build/esm/locale/index.mjs"
+    },
+    "./format": {
+      "types": "./build/format/index.d.ts",
+      "react-native": "./src/format/index.ts",
+      "import": "./build/esm/format/index.mjs",
+      "require": "./build/cjs/format/index.cjs",
+      "default": "./build/esm/format/index.mjs"
+    },
+    "./parse": {
+      "types": "./build/parse/index.d.ts",
+      "react-native": "./src/parse/index.ts",
+      "import": "./build/esm/parse/index.mjs",
+      "require": "./build/cjs/parse/index.cjs",
+      "default": "./build/esm/parse/index.mjs"
+    },
+    "./unit": {
+      "types": "./build/unit/index.d.ts",
+      "react-native": "./src/unit/index.ts",
+      "import": "./build/esm/unit/index.mjs",
+      "require": "./build/cjs/unit/index.cjs",
+      "default": "./build/esm/unit/index.mjs"
+    },
+    "./input": {
+      "types": "./build/input/index.d.ts",
+      "react-native": "./src/input/index.ts",
+      "import": "./build/esm/input/index.mjs",
+      "require": "./build/cjs/input/index.cjs",
+      "default": "./build/esm/input/index.mjs"
+    },
+    "./expo": {
+      "types": "./build/expo/index.d.ts",
+      "react-native": "./src/expo/index.ts",
+      "import": "./build/esm/expo/index.mjs",
+      "require": "./build/cjs/expo/index.cjs",
+      "default": "./build/esm/expo/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    ".agent",
+    "scripts/install-agent-skills.js",
+    "android",
+    "ios",
+    "skills",
+    "src",
+    "!src/__tests__",
+    "build",
+    "!build/**/*.js",
+    "!build/**/*.js.map",
+    "docs",
+    "!docs/private",
+    "!docs/private/**",
+    "!docs/PHASE_PLAN.md",
+    "plugin",
+    "app.plugin.js",
+    "expo-module.config.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "build": "expo-module build",
+    "build": "expo-module build && node scripts/build-package-entrypoints.js",
     "clean": "expo-module clean",
     "lint": "expo-module lint",
     "test": "expo-module test",
-    "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
+    "test:watch": "expo-module test -- --watch",
+    "typecheck": "tsc --noEmit",
+    "generate:cldr-lite": "node scripts/generate-cldr-lite.js",
+    "check:cldr-lite": "node scripts/generate-cldr-lite.js --check",
+    "benchmark": "npm run build && node scripts/benchmark.js",
+    "benchmark:report": "npm run --silent build >/dev/null && node scripts/benchmark.js --json",
+    "benchmark:budget": "npm run build && node scripts/check-benchmark-budget.js",
+    "bundle:budget": "npm run build && node scripts/check-bundle-budget.js",
+    "api:surface": "npm run build && node scripts/check-public-api.js",
+    "value-format:smoke": "npm run build && node scripts/check-value-format-smoke.js",
+    "value-format:report": "npm run --silent build >/dev/null && node scripts/check-value-format-smoke.js --json",
+    "arithmetic:smoke": "npm run build && node scripts/check-arithmetic-smoke.js",
+    "currency:registry": "npm run build && node scripts/check-currency-registry.js",
+    "unit:registry": "npm run build && node scripts/check-unit-registry.js",
+    "input:replay": "npm run build && node scripts/input-replay-smoke.js",
+    "input:replay:report": "npm run --silent build >/dev/null && node scripts/input-replay-smoke.js --json",
+    "report:contracts": "npm run build && node scripts/check-report-contracts.js",
+    "docs:check": "node scripts/check-public-docs.js",
+    "release:check": "npm run build && node scripts/check-release-readiness.js",
+    "skills:check": "node scripts/check-agent-skills.js",
+    "skills:install": "node scripts/install-agent-skills.js --target=all",
+    "skills:install:check": "node scripts/install-agent-skills.js --target=all --dry-run",
+    "skills:install:codex": "node scripts/install-agent-skills.js --target=codex",
+    "skills:install:claude": "node scripts/install-agent-skills.js --target=claude",
+    "showcase:contract": "node scripts/check-showcase-contract.js",
+    "hardening": "npm run check:cldr-lite && npm run bundle:budget && npm run benchmark:budget && node scripts/check-public-api.js && node scripts/check-value-format-smoke.js && node scripts/check-arithmetic-smoke.js && node scripts/check-currency-registry.js && node scripts/check-unit-registry.js && node scripts/input-replay-smoke.js && node scripts/check-report-contracts.js && npm run docs:check && npm run showcase:contract && npm run skills:check && npm run skills:install:check && npm run example:typecheck && npm run example:doctor && npm run expo:check && npm run example:expo-check && npm run package:smoke && npm run release:check",
+    "prepare": "expo-module prepare && node scripts/build-package-entrypoints.js",
+    "prepublishOnly": "npm run clean && npm run build && npm run typecheck && npm test && npm run hardening",
+    "example:doctor": "npm --prefix example run doctor",
+    "example:typecheck": "npm --prefix example run typecheck",
+    "expo:check": "node scripts/check-expo-install.js root --allow-typescript-latest",
+    "example:expo-check": "node scripts/check-expo-install.js example",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
-    "open:android": "open -a \"Android Studio\" example/android"
+    "open:android": "open -a \"Android Studio\" example/android",
+    "package:smoke": "npm run build && node scripts/package-smoke.js"
   },
   "keywords": [
+    "currency",
+    "decimal",
     "react-native",
     "expo",
-    "my-module",
-    "ExpoNumeratorModule"
+    "input",
+    "intl",
+    "localization",
+    "money",
+    "number-format",
+    "rounding"
   ],
-  "repository": "https://github.com/Madraka/my-module",
+  "repository": "https://github.com/Madraka/expo-numerator",
   "bugs": {
-    "url": "https://github.com/Madraka/my-module/issues"
+    "url": "https://github.com/Madraka/expo-numerator/issues"
   },
   "author": "Madraka <asker_17@msn.com> (https://github.com/Madraka)",
   "license": "MIT",
-  "homepage": "https://github.com/Madraka/my-module#readme",
-  "dependencies": {},
+  "homepage": "https://www.npmjs.com/package/expo-numerator",
+  "optionalDependencies": {
+    "expo-localization": "*"
+  },
   "devDependencies": {
-    "@types/react": "~19.1.1",
+    "@types/react": "~19.2.10",
+    "expo": "^55.0.23",
     "expo-module-scripts": "^55.0.2",
-    "expo": "^55.0.20",
-    "react-native": "0.82.1"
+    "react-native": "0.83.6",
+    "typescript": "^6.0.3"
   },
   "peerDependencies": {
     "expo": "*",
-    "react": "*",
-    "react-native": "*"
+    "react": ">=18",
+    "react-native": ">=0.72"
+  },
+  "peerDependenciesMeta": {
+    "expo": {
+      "optional": true
+    }
   }
 }

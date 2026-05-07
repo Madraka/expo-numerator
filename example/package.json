@@ -1,20 +1,28 @@
 {
-  "name": "my-module-example",
+  "name": "expo-numerator-example",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
+    "doctor": "npx expo-doctor",
     "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~54.0.33",
-    "react": "19.1.0",
-    "react-native": "0.81.5"
+    "expo": "~55.0.23",
+    "expo-constants": "~55.0.16",
+    "expo-linking": "~55.0.15",
+    "expo-router": "~55.0.14",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-native": "0.83.6",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-screens": "~4.23.0"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
+    "@types/react": "~19.2.10",
     "typescript": "~5.9.2"
   },
   "private": true,

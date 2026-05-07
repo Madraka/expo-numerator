@@ -52,6 +52,22 @@ node_modules/
 npm-debug.log
 yarn-debug.log
 yarn-error.log
+.benchmark-build*/
 
 # Expo
 .expo/*
+
+# Private/local planning and instruction notes
+docs/private/
+docs/internal/
+docs/PHASE_PLAN.md
+docs/*PRIVATE*.md
+docs/*PERSONAL*.md
+docs/*DRAFT*.md
+docs/*LOCAL*.md
+*.private.md
+*.personal.md
+*.local.md
+*-talimatnamesi.txt
+talimatname*.txt
+expo-numerator-engineering-talimatnamesi.txt

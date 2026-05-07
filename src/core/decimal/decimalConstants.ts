@@ -1,0 +1,1 @@
+export const DEFAULT_MAX_DECIMAL_INPUT_LENGTH = 128;

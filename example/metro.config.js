@@ -1,4 +1,4 @@
-// Learn more https://docs.expo.io/guides/customizing-metro
+// Learn more: https://docs.expo.dev/guides/customizing-metro/
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 
@@ -19,14 +19,13 @@ config.resolver.nodeModulesPaths = [
 ];
 
 config.resolver.extraNodeModules = {
-  'my-module': '..',
+  'expo-numerator': '..',
 };
 
 config.watchFolders = [path.resolve(__dirname, '..')];
 
 config.transformer.getTransformOptions = async () => ({
   transform: {
-    experimentalImportSupport: false,
     inlineRequires: true,
   },
 });
