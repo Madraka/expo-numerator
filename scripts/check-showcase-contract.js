@@ -15,6 +15,10 @@ const inputPageFile = path.join(
   repoRoot,
   "example/src/showcase/pages/input-page.tsx",
 );
+const unitsPageFile = path.join(
+  repoRoot,
+  "example/src/showcase/pages/units-page.tsx",
+);
 const inputAcceptanceFile = path.join(repoRoot, "docs/INPUT_ACCEPTANCE.md");
 
 const additionalSelectors = [
@@ -62,6 +66,7 @@ function main() {
   assertScreenSelectors(routes, failures);
   assertInputAcceptanceDocs(routes, failures);
   assertAdditionalSelectors(failures);
+  assertUnitsPageSafeParse(failures);
 
   if (failures.length > 0) {
     console.error(`Showcase contract failed:\n${failures.join("\n")}`);
@@ -206,6 +211,16 @@ function assertAdditionalSelectors(failures) {
         );
       }
     }
+  }
+}
+
+function assertUnitsPageSafeParse(failures) {
+  const source = read(unitsPageFile);
+
+  if (/\bparseUnit\(/.test(source)) {
+    failures.push(
+      "Units showcase must use safeParseUnit for rendered parse demos.",
+    );
   }
 }
 

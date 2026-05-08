@@ -12,7 +12,6 @@ import {
   getRegisteredUnitCodes,
   getUnitSystemForLocale,
   getUnitsByDimension,
-  parseUnit,
   safeParseUnit,
   unit,
 } from "expo-numerator";
@@ -119,10 +118,11 @@ export function UnitsPage() {
     scale: 2,
     unitDisplay: "long",
   });
-  const parsedArea = parseUnit(
-    numerator.locale === "tr-TR" ? "1,5 m²" : "1.5 m²",
-    { locale: numerator.locale },
-  );
+  const parsedAreaText = `${numerator.formatNumber("1.5")} m²`;
+  const parsedArea = numerator.safeParseUnit(parsedAreaText);
+  const parsedExpectedArea = numerator.safeParseUnit("1500", {
+    unit: "square-meter",
+  });
   const invalid = safeParseUnit("12.5 unknown-unit");
 
   return (
@@ -170,10 +170,17 @@ export function UnitsPage() {
           rows={[
             ['unit("12.5", "km")', `${distance.value} ${distance.unit}`],
             ['unit("1500", "m²")', `${area.value} ${area.unit}`],
-            ["parseUnit area", `${parsedArea.value} ${parsedArea.unit}`],
             [
-              'parseUnit("1500", unit square-meter)',
-              parseUnit("1500", { unit: "square-meter" }).unit,
+              `safeParseUnit("${parsedAreaText}")`,
+              parsedArea.ok
+                ? `${parsedArea.value.value} ${parsedArea.value.unit}`
+                : parsedArea.error.code,
+            ],
+            [
+              'safeParseUnit("1500", unit square-meter)',
+              parsedExpectedArea.ok
+                ? parsedExpectedArea.value.unit
+                : parsedExpectedArea.error.code,
             ],
             [
               "unknown unit",
