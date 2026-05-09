@@ -35,6 +35,7 @@ const publicSubpaths = [
   "expo-numerator/format",
   "expo-numerator/parse",
   "expo-numerator/unit",
+  "expo-numerator/phone",
   "expo-numerator/input",
   "expo-numerator/expo",
 ];

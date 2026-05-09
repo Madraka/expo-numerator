@@ -89,6 +89,23 @@ import {
   safeParsePercent,
   safeParseUnit,
 } from "../parse/safeParse";
+import { formatPhone } from "../phone/formatPhone";
+import { parsePhone, safeParsePhone } from "../phone/parsePhone";
+import { phone } from "../phone/phone";
+import { createPhoneInputState } from "../phone/phoneInputState";
+import {
+  getPhoneCountries,
+  getPhoneCountryMeta,
+  getPhoneExampleNumber,
+  getPhoneMetadataInfo,
+} from "../phone/phoneRegistry";
+import type {
+  PhoneFormatOptions,
+  PhoneValue,
+  PhoneInputOptions,
+  PhoneCountryListOptions,
+  PhoneParseOptions,
+} from "../phone/phoneTypes";
 import { roundDecimal } from "../rounding/roundDecimal";
 import { convertUnit } from "../unit/convertUnit";
 import {
@@ -269,6 +286,29 @@ export type NumeratorFacade = {
     normalizeCode: typeof normalizeUnitCode;
     register: typeof registerUnit;
   };
+  phone: {
+    create: typeof phone;
+    format: (
+      value: Parameters<typeof formatPhone>[0],
+      options?: PhoneFormatOptions,
+    ) => string;
+    parse: (
+      text: string,
+      options?: PhoneParseOptions,
+    ) => ReturnType<typeof parsePhone>;
+    safeParse: (
+      text: string,
+      options?: PhoneParseOptions,
+    ) => ReturnType<typeof safeParsePhone>;
+    input: (options?: PhoneInputOptions) => PhoneInputOptions;
+    state: typeof createPhoneInputState;
+    countries: (
+      options?: PhoneCountryListOptions,
+    ) => ReturnType<typeof getPhoneCountries>;
+    getCountry: typeof getPhoneCountryMeta;
+    example: typeof getPhoneExampleNumber;
+    metadata: typeof getPhoneMetadataInfo;
+  };
   input: {
     state: typeof createNumberInputState;
     decimal: (options?: NumberInputOptions) => NumberInputOptions;
@@ -279,6 +319,7 @@ export type NumeratorFacade = {
     percent: (options?: PercentInputOptions) => NumberInputOptions;
     integer: (options?: IntegerInputOptions) => NumberInputOptions;
     unit: (unitCode: string, options?: UnitInputOptions) => NumberInputOptions;
+    phone: (options?: PhoneInputOptions) => PhoneInputOptions;
   };
   locales: {
     resolve: typeof resolveLocale;
@@ -558,6 +599,33 @@ export function createNumerator(
         return registerUnit(registration);
       },
     }),
+    phone: Object.freeze({
+      create(input: string | PhoneValue, parseOptions = {}) {
+        return phone(input, withPhoneDefaults(parseOptions, locale));
+      },
+      format(
+        value: string | PhoneValue,
+        formatOptions: PhoneFormatOptions = {},
+      ) {
+        return formatPhone(value, formatOptions);
+      },
+      parse(text: string, parseOptions = {}) {
+        return parsePhone(text, withPhoneDefaults(parseOptions, locale));
+      },
+      safeParse(text: string, parseOptions = {}) {
+        return safeParsePhone(text, withPhoneDefaults(parseOptions, locale));
+      },
+      input(inputOptions = {}) {
+        return withPhoneDefaults(inputOptions, locale);
+      },
+      state: createPhoneInputState,
+      countries(countryOptions = {}) {
+        return getPhoneCountries(withLocale(countryOptions, locale));
+      },
+      getCountry: getPhoneCountryMeta,
+      example: getPhoneExampleNumber,
+      metadata: getPhoneMetadataInfo,
+    }),
     input: Object.freeze({
       state: createNumberInputState,
       decimal(inputOptions = {}) {
@@ -581,6 +649,9 @@ export function createNumerator(
           withLocale(inputOptions, locale),
         );
       },
+      phone(inputOptions = {}) {
+        return withPhoneDefaults(inputOptions, locale);
+      },
     }),
     locales: Object.freeze({
       resolve: resolveLocale,
@@ -588,6 +659,22 @@ export function createNumerator(
       normalizeDigits,
     }),
   });
+}
+
+function withPhoneDefaults<
+  TOptions extends PhoneInputOptions | PhoneParseOptions,
+>(options: TOptions, locale: string): TOptions {
+  return {
+    ...options,
+    defaultRegion:
+      options.defaultRegion ?? inferRegionFromLocale(locale) ?? "US",
+  };
+}
+
+function inferRegionFromLocale(locale: string): string | null {
+  const region = locale.split("-").find((part) => /^[A-Z]{2}$/.test(part));
+
+  return region ?? null;
 }
 
 function withLocale<TOptions extends { readonly locale?: string }>(

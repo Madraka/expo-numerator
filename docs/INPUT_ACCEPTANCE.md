@@ -48,6 +48,7 @@ The example app uses Expo Router and is split into route-level pages:
 - `/parse`
 - `/errors`
 - `/input`
+- `/phone`
 - `/expo`
 - `/package`
 - `/hardening`
@@ -64,6 +65,7 @@ It exposes stable navigation selectors for simulator/device smoke tests:
 - `expo-numerator-page-parse`
 - `expo-numerator-page-errors`
 - `expo-numerator-page-input`
+- `expo-numerator-page-phone`
 - `expo-numerator-page-expo`
 - `expo-numerator-page-package`
 - `expo-numerator-page-hardening`
@@ -80,6 +82,7 @@ It also exposes stable screen-loaded selectors:
 - `expo-numerator-screen-parse`
 - `expo-numerator-screen-errors`
 - `expo-numerator-screen-input`
+- `expo-numerator-screen-phone`
 - `expo-numerator-screen-expo`
 - `expo-numerator-screen-package`
 - `expo-numerator-screen-hardening`
@@ -111,6 +114,22 @@ The Currency page keeps additional selectors for registry filtering smoke tests:
 - `expo-numerator-currency-filter-zero`
 - `expo-numerator-currency-filter-three`
 - `expo-numerator-currency-filter-four`
+
+The Phone page keeps additional selectors for mobile-first phone input and the
+Expo Router native country picker sheet smoke tests:
+
+- `expo-numerator-phone-input`
+- `expo-numerator-phone-parsed`
+- `expo-numerator-phone-state`
+- `expo-numerator-phone-profile-switch`
+- `expo-numerator-phone-profile-max`
+- `expo-numerator-phone-asyoutype`
+- `expo-numerator-phone-type-table`
+- `expo-numerator-phone-country-open`
+- `expo-numerator-phone-country-sheet`
+- `expo-numerator-phone-country-search`
+- `expo-numerator-phone-country-picker`
+- `expo-numerator-phone-country-preview-TR`
 
 ## Replay Smoke
 

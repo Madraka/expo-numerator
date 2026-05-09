@@ -31,6 +31,8 @@ Codex starts from `AGENTS.md`; Claude starts from `CLAUDE.md`. Both should use
   locale registry, formatting, parsing, and digit normalization.
 - `skills/maintainer/expo-numerator-unit/SKILL.md`: measurement registry,
   conversion, and unit input profiles.
+- `skills/maintainer/expo-numerator-phone/SKILL.md`: E.164 phone values,
+  phone metadata, validation, input, and country picker.
 - `skills/maintainer/expo-numerator-expo-example/SKILL.md`: Expo SDK 55 example
   app, Expo Router showcase, safe area, and route-level demos.
 - `skills/maintainer/expo-numerator-package-release/SKILL.md`: package exports,

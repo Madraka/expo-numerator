@@ -8,7 +8,7 @@ const buildRoot = path.join(repoRoot, "build");
 
 const budgets = [
   { label: "esm entry", file: "esm/index.mjs", maxBytes: 8_000 },
-  { label: "cjs entry", file: "cjs/index.cjs", maxBytes: 22_000 },
+  { label: "cjs entry", file: "cjs/index.cjs", maxBytes: 28_000 },
   {
     label: "esm input component",
     file: "esm/input/NumberInput.mjs",
@@ -23,13 +23,13 @@ const budgets = [
     label: "esm runtime total",
     directory: "esm",
     extension: ".mjs",
-    maxBytes: 197_000,
+    maxBytes: 650_000,
   },
   {
     label: "cjs runtime total",
     directory: "cjs",
     extension: ".cjs",
-    maxBytes: 253_000,
+    maxBytes: 730_000,
   },
 ];
 
@@ -46,12 +46,12 @@ function main() {
       ? getFileSize(path.join(buildRoot, budget.file))
       : getRuntimeSize(
           path.join(buildRoot, budget.directory),
-          budget.extension,
+          budget.extension
         );
 
     if (bytes > budget.maxBytes) {
       failures.push(
-        `${budget.label}: ${bytes} bytes exceeds ${budget.maxBytes} bytes`,
+        `${budget.label}: ${bytes} bytes exceeds ${budget.maxBytes} bytes`
       );
     }
   }
@@ -61,7 +61,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log("Bundle budget passed.");
+  console.log(`Bundle budget passed. ${getPhoneProfileSizeSummary()}`);
 }
 
 function getFileSize(filePath) {
@@ -80,6 +80,32 @@ function walk(directory) {
 
     return entry.isDirectory() ? walk(entryPath) : [entryPath];
   });
+}
+
+function getPhoneProfileSizeSummary() {
+  const generatedPath = path.join(
+    repoRoot,
+    "src",
+    "phone",
+    "generatedPhoneMetadata.ts"
+  );
+
+  if (!fs.existsSync(generatedPath)) {
+    return "Phone profile sizes unavailable.";
+  }
+
+  const generated = fs.readFileSync(generatedPath, "utf8");
+  const sizes = [
+    ...generated.matchAll(
+      /profile: "(lite|mobile|max)"[\s\S]*?sizeHintBytes: (\d+)/g
+    ),
+  ]
+    .map((match) => `${match[1]}=${Math.round(Number(match[2]) / 1024)}KB`)
+    .join(", ");
+
+  return sizes
+    ? `Phone profile sizes: ${sizes}.`
+    : "Phone profile sizes unavailable.";
 }
 
 main();

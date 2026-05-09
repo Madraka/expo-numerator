@@ -29,6 +29,7 @@ Facade domains:
 - `percent`: create, safe, format, parse, safeParse, input.
 - `unit`: create, safe, format, formatForLocale, formatBestFit, parse,
   safeParse, conversion, registry helpers.
+- `phone`: create, format, parse, safeParse, input, country metadata, examples.
 - `input`: state helpers and decimal, money, percent, integer, unit option
   factories.
 - `locales`: resolve, symbols, digit normalization.
@@ -144,6 +145,43 @@ The built-in unit registry covers length, area, volume, mass, speed,
 acceleration, temperature, time, data, frequency, energy, power, pressure,
 angle, force, torque, density, electric current, and electric potential.
 
+## Phone
+
+```ts
+import {
+  formatPhone,
+  getPhoneCountries,
+  getPhoneExampleNumber,
+  getPhoneMetadataInfo,
+  parsePhone,
+  safeParsePhone,
+  type PhoneMetadataProfile,
+} from "expo-numerator/phone";
+
+const profile: PhoneMetadataProfile = "max";
+const value = parsePhone("0501 234 56 78", {
+  defaultRegion: "TR",
+  metadataProfile: profile,
+});
+
+value.e164; // "+905012345678"
+formatPhone(value, { format: "national", metadataProfile: profile }); // "0501 234 56 78"
+formatPhone(value, { format: "rfc3966" }); // "tel:+905012345678"
+safeParsePhone("+12015550123").ok; // true
+getPhoneCountries({ preferredRegions: ["TR"], locale: "tr-TR" })[0].region;
+getPhoneExampleNumber("US", { type: "tollFree" }); // "+18002345678"
+getPhoneMetadataInfo("max").profile; // "max"
+```
+
+Phone values use E.164 as the canonical storage format. Calling-code and
+territory metadata is generated from the ITU E.164-backed libphonenumber
+metadata snapshot checked by `npm run phone:metadata`. The public
+`metadataProfile` option accepts `"lite"`, `"mobile"`, or `"max"`; runtime stays
+JS-only, while oracle packages are dev/test-only. Formatting follows the selected
+phone region rather than the display locale; locale is used for country picker
+labels. Default validation is mobile-first for sign-up and OTP flows, and
+`validationMode: "possible"` is available for tolerant draft parsing.
+
 ## Input
 
 ```tsx
@@ -153,6 +191,7 @@ import {
   createMoneyInputOptions,
   useNumberInput,
 } from "expo-numerator/input";
+import { PhoneCountryPicker, PhoneInput, usePhoneInput } from "expo-numerator/phone";
 
 const options = createMoneyInputOptions("TRY", {
   locale: "tr-TR",
@@ -160,6 +199,7 @@ const options = createMoneyInputOptions("TRY", {
 });
 
 <MoneyInput locale="tr-TR" currency="TRY" entryMode="minorUnits" />;
+<PhoneInput defaultRegion="TR" validationMode="mobile" />;
 ```
 
 Money input entry modes:
@@ -200,5 +240,6 @@ module is unavailable.
 - `expo-numerator/format`
 - `expo-numerator/parse`
 - `expo-numerator/unit`
+- `expo-numerator/phone`
 - `expo-numerator/input`
 - `expo-numerator/expo`

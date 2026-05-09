@@ -15,6 +15,7 @@ const requiredSkills = [
     path: "skills/maintainer/expo-numerator-locale-format-parse/SKILL.md",
   },
   { id: "expo-numerator-unit", path: "skills/maintainer/expo-numerator-unit/SKILL.md" },
+  { id: "expo-numerator-phone", path: "skills/maintainer/expo-numerator-phone/SKILL.md" },
   { id: "expo-numerator-expo-example", path: "skills/maintainer/expo-numerator-expo-example/SKILL.md" },
   { id: "expo-numerator-package-release", path: "skills/maintainer/expo-numerator-package-release/SKILL.md" },
 ];

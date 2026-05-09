@@ -15,6 +15,14 @@ const inputPageFile = path.join(
   repoRoot,
   "example/src/showcase/pages/input-page.tsx",
 );
+const phonePageFile = path.join(
+  repoRoot,
+  "example/src/showcase/pages/phone-page.tsx",
+);
+const phoneCountryPickerSheetFile = path.join(
+  repoRoot,
+  "example/src/showcase/pages/phone-country-picker-sheet.tsx",
+);
 const unitsPageFile = path.join(
   repoRoot,
   "example/src/showcase/pages/units-page.tsx",
@@ -48,6 +56,25 @@ const additionalSelectors = [
     template: "expo-numerator-currency-filter-${item.id}",
     templateIds: ["all", "zero", "three", "four"],
   },
+  {
+    sourceFiles: [phonePageFile, phoneCountryPickerSheetFile],
+    selectors: [
+      "expo-numerator-phone-input",
+      "expo-numerator-phone-parsed",
+      "expo-numerator-phone-state",
+      "expo-numerator-phone-profile-switch",
+      "expo-numerator-phone-profile-max",
+      "expo-numerator-phone-asyoutype",
+      "expo-numerator-phone-type-table",
+      "expo-numerator-phone-country-open",
+      "expo-numerator-phone-country-sheet",
+      "expo-numerator-phone-country-search",
+      "expo-numerator-phone-country-picker",
+      "expo-numerator-phone-country-preview-TR",
+    ],
+    template: "expo-numerator-phone-country-preview-${country.region}",
+    templateIds: ["TR"],
+  },
 ];
 
 function main() {
@@ -63,6 +90,7 @@ function main() {
   assertUnique(routes, "id", failures);
   assertRouteFiles(routes, failures);
   assertLayoutScreens(routes, failures);
+  assertPhoneCountryPickerSheet(failures);
   assertScreenSelectors(routes, failures);
   assertInputAcceptanceDocs(routes, failures);
   assertAdditionalSelectors(failures);
@@ -145,6 +173,27 @@ function assertLayoutScreens(routes, failures) {
   }
 }
 
+function assertPhoneCountryPickerSheet(failures) {
+  const layoutSource = read(layoutFile);
+  const routeFile = path.join(repoRoot, "example/app/phone-country-picker.tsx");
+
+  if (!fs.existsSync(routeFile)) {
+    failures.push("Missing Expo Router file for phone country picker sheet.");
+  }
+
+  if (!fs.existsSync(phoneCountryPickerSheetFile)) {
+    failures.push("Missing phone country picker sheet implementation.");
+  }
+
+  if (!/<Stack\.Screen\s+name="phone-country-picker"/.test(layoutSource)) {
+    failures.push("Missing Stack.Screen for phone country picker sheet.");
+  }
+
+  if (!layoutSource.includes('presentation: "formSheet"')) {
+    failures.push("Phone country picker must use Expo Router formSheet.");
+  }
+}
+
 function assertScreenSelectors(routes, failures) {
   const componentsSource = read(componentsFile);
 
@@ -198,16 +247,16 @@ function assertAdditionalSelectors(failures) {
   const docs = read(inputAcceptanceFile);
 
   for (const group of additionalSelectors) {
-    const source = read(group.sourceFile);
+    const sources = (group.sourceFiles ?? [group.sourceFile]).map(read);
 
     for (const selector of group.selectors) {
       if (!docs.includes(`- \`${selector}\``)) {
         failures.push(`Missing INPUT_ACCEPTANCE selector entry: ${selector}`);
       }
 
-      if (!selectorExistsInSource(selector, source, group)) {
+      if (!sources.some((source) => selectorExistsInSource(selector, source, group))) {
         failures.push(
-          `Selector is documented but not produced by ${relative(group.sourceFile)}: ${selector}`,
+          `Selector is documented but not produced by showcase sources: ${selector}`,
         );
       }
     }
@@ -233,11 +282,19 @@ function selectorExistsInSource(selector, source, group) {
     return false;
   }
 
-  return group.templateIds.some(
-    (id) =>
-      selector === group.template.replace("${props.id}", id).replace("${item.id}", id) &&
-      (source.includes(`id="${id}"`) || source.includes(`id: "${id}"`)),
-  );
+  return group.templateIds.some((id) => {
+    const rendered = group.template
+      .replace("${props.id}", id)
+      .replace("${item.id}", id)
+      .replace("${country.region}", id);
+
+    return (
+      selector === rendered &&
+      (source.includes(`id="${id}"`) ||
+        source.includes(`id: "${id}"`) ||
+        source.includes(`"${id}"`))
+    );
+  });
 }
 
 function getRouteName(route) {

@@ -111,6 +111,32 @@ n.unit.convertForLocale(n.unit.create("1", "bar"), { locale: "en-US", scale: 4 }
 
 Use canonical units for storage and convert only at display or input boundaries.
 
+## Phone Input and Storage
+
+```tsx
+import { PhoneInput, parsePhone, formatPhone } from "expo-numerator/phone";
+
+const value = parsePhone("0501 234 56 78", { defaultRegion: "TR" });
+
+value.e164; // "+905012345678"
+formatPhone(value, { format: "rfc3966" }); // "tel:+905012345678"
+
+<PhoneInput
+  defaultRegion="TR"
+  metadataProfile="mobile"
+  validationMode="mobile"
+  onValueChange={(phoneValue) => {
+    phoneValue?.kind === "phone" ? phoneValue.e164 : null;
+  }}
+/>;
+```
+
+Store phone numbers in E.164. Use national or international formatting only for
+display. Phone formatting is region-based, while locale affects country picker
+labels. `getPhoneMetadataInfo("lite" | "mobile" | "max")` exposes the ITU E.164
+and libphonenumber source snapshot plus profile size hints. Use `max` when you
+need stricter type/format parity; keep `lite` or `mobile` for default app input.
+
 ## Digit Normalization
 
 ```ts
@@ -125,6 +151,7 @@ numbering systems.
 ```ts
 import { addDecimal } from "expo-numerator/core";
 import { formatNumber } from "expo-numerator/format";
+import { parsePhone } from "expo-numerator/phone";
 import { safeParseNumber } from "expo-numerator/parse";
 ```
 

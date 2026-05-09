@@ -18,6 +18,10 @@ import type {
   PercentValue,
   UnitValue,
 } from "../core/value/types";
+import {
+  createNumerator,
+  type NumeratorFacade,
+} from "../facade/createNumerator";
 import { format } from "../format/format";
 import { formatMoney } from "../format/formatMoney";
 import { formatNumber } from "../format/formatNumber";
@@ -117,6 +121,7 @@ export type ExpoNumerator = {
     text: string,
     options?: UnitParseOptions,
   ) => ReturnType<typeof safeParseUnit>;
+  phone: NumeratorFacade["phone"];
   getNumberInputOptions: (options?: NumberInputOptions) => NumberInputOptions;
 };
 
@@ -132,6 +137,7 @@ export function createExpoNumerator(
   const locale = resolveLocale({ locale: requestedLocale, fallbackLocale });
   const platform = getNativePlatformInfo();
   const symbols = getLocaleSymbols(locale);
+  const facade = createNumerator({ locale, fallbackLocale });
 
   return Object.freeze({
     locale,
@@ -218,6 +224,7 @@ export function createExpoNumerator(
     safeParseUnit(text, parseOptions = {}) {
       return safeParseUnit(text, withLocale(parseOptions, locale));
     },
+    phone: facade.phone,
     getNumberInputOptions(inputOptions = {}) {
       return withLocale(inputOptions, locale);
     },

@@ -16,7 +16,8 @@ release artifacts.
 - Load the matching maintainer domain skill after this skill:
   `expo-numerator-core`, `expo-numerator-money-input`,
   `expo-numerator-locale-format-parse`, `expo-numerator-unit`,
-  `expo-numerator-expo-example`, or `expo-numerator-package-release`.
+  `expo-numerator-phone`, `expo-numerator-expo-example`, or
+  `expo-numerator-package-release`.
 - Preserve public API through root and domain subpath exports. Internal file
   movement is acceptable only when public entrypoints and package smoke stay
   stable.

@@ -9,6 +9,7 @@ export type ShowcaseRoute =
   | "/parse"
   | "/errors"
   | "/input"
+  | "/phone"
   | "/expo"
   | "/package"
   | "/hardening";
@@ -80,6 +81,12 @@ export const showcasePages: ShowcasePage[] = [
     id: "input",
     title: "Input Lab",
     caption: "Caret and lifecycle",
+  },
+  {
+    href: "/phone",
+    id: "phone",
+    title: "Phone",
+    caption: "E.164 input and picker",
   },
   {
     href: "/expo",

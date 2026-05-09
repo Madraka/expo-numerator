@@ -6,7 +6,7 @@ under `docs/private/` or another ignored local path.
 
 ## Current Release Line
 
-`0.1.0` is the Foundation+Core release line with:
+`0.1.1` is the Foundation+Core release line with:
 
 - String-first decimal, money, percent, and unit values.
 - Decimal arithmetic, rounding, comparison, normalization, and scale helpers.
@@ -15,6 +15,10 @@ under `docs/private/` or another ignored local path.
   APIs.
 - Measurement unit registry, conversion, best-fit display, and locale
   preferences.
+- E.164 phone parsing, formatting, mobile-first validation, global
+  libphonenumber/ITU-backed country metadata, and styles-free phone input/picker
+  surfaces. Phone metadata now has lite/mobile/max profile reporting and
+  dev-only libphonenumber oracle parity tests for long-term hardening.
 - React Native input state helpers, headless hook, styles-free input component,
   and ready-made money, percent, integer, and unit inputs.
 - Expo integration helpers, provider/hook, optional localization lookup, and

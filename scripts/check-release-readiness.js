@@ -15,6 +15,9 @@ const requiredFiles = [
   "skills/README.md",
   "scripts/install-agent-skills.js",
   "scripts/check-public-docs.js",
+  "scripts/check-phone-metadata.js",
+  "scripts/generate-phone-metadata.js",
+  "scripts/phone-metadata-source.json",
   "README.md",
   "CHANGELOG.md",
   "LICENSE",
@@ -34,6 +37,7 @@ const requiredFiles = [
   "skills/maintainer/expo-numerator-money-input/SKILL.md",
   "skills/maintainer/expo-numerator-locale-format-parse/SKILL.md",
   "skills/maintainer/expo-numerator-unit/SKILL.md",
+  "skills/maintainer/expo-numerator-phone/SKILL.md",
   "skills/maintainer/expo-numerator-expo-example/SKILL.md",
   "skills/maintainer/expo-numerator-package-release/SKILL.md",
 ];
@@ -178,6 +182,9 @@ function checkTarballContents() {
     "build/cjs/index.cjs",
     "build/esm/money/index.mjs",
     "build/cjs/money/index.cjs",
+    "build/phone/index.d.ts",
+    "build/esm/phone/index.mjs",
+    "build/cjs/phone/index.cjs",
     "build/input/index.d.ts",
     "docs/RELEASE_CHECKLIST.md",
     "docs/README.md",
@@ -189,6 +196,7 @@ function checkTarballContents() {
     "skills/consumer/expo-numerator-consumer/SKILL.md",
     "skills/maintainer/expo-numerator-maintainer/SKILL.md",
     "skills/maintainer/expo-numerator-package-release/SKILL.md",
+    "skills/maintainer/expo-numerator-phone/SKILL.md",
   ];
   const failures = [];
 

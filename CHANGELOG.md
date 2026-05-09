@@ -6,6 +6,33 @@
 
 ### 🎉 New features
 
+### 🐛 Bug fixes
+
+### 💡 Others
+
+## 0.1.1 - 2026-05-09
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Added `expo-numerator/phone` as a first-class public domain with E.164
+  parsing, RFC 3966 formatting, mobile-first validation, global country
+  metadata, phone input state helpers, `PhoneInput`, and `PhoneCountryPicker`.
+- Added checked-in phone metadata generated from Google libphonenumber metadata
+  with `lite`, `mobile`, and `max` profile size reporting.
+- Added richer phone type detection, typed phone examples, profile-aware
+  `metadataProfile` options, and `getPhoneMetadataInfo(profile)`.
+- Added libphonenumber-backed `availableFormats`, international formatting
+  rules, national-prefix formatting, and digit-index caret handling for
+  stronger as-you-type behavior.
+- Added dev-only phone oracle coverage with `google-libphonenumber` and
+  `libphonenumber-js` parity smoke tests.
+- Added the `/phone` showcase route with profile switching, country sheet
+  picker, as-you-type demo, output table, and type detection table.
+
+- Added package release preparation for `0.1.1`.
+
 - Scaffolded `expo-numerator` as a standalone Expo Module package.
 - Added Foundation+Core public API for decimal, money, percent, unit, rounding,
   currency registry, typed errors, starter locale data, and digit maps.

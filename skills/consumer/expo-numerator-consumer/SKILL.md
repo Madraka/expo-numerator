@@ -16,13 +16,16 @@ flows, package consumer guidance, integration recipes, and API ergonomics.
 - Prefer `createNumerator` for app-level flows and domain subpath imports for
   focused bundles.
 - Document only root or domain subpath imports such as `expo-numerator/money`,
-  `expo-numerator/format`, `expo-numerator/input`, and `expo-numerator/expo`.
+  `expo-numerator/format`, `expo-numerator/phone`, `expo-numerator/input`, and
+  `expo-numerator/expo`.
 - Do not expose `src/*`, generated build paths, scripts, registry internals, or
   maintainer-only test fixtures as consumer guidance.
 - Use `safe*` APIs for form, paste, API boundary, and user-generated input
   examples. Use throwing APIs only when the call site owns validation.
 - For money input, explain entry mode choices in product terms:
   `plain`, `liveGroupedEndLocked`, `minorUnits`, and `integerMajor`.
+- For phone flows, document E.164 as the storage format, RFC3966 for `tel:`
+  links, and region-based formatting separate from locale-based country labels.
 - Consumer examples must stay copy-pasteable and avoid hidden setup.
 
 ## Verification

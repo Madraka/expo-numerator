@@ -1,6 +1,6 @@
 {
   "name": "expo-numerator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Production-grade numeric infrastructure for Expo and React Native.",
   "main": "build/cjs/index.cjs",
   "module": "build/esm/index.mjs",
@@ -64,6 +64,13 @@
       "require": "./build/cjs/unit/index.cjs",
       "default": "./build/esm/unit/index.mjs"
     },
+    "./phone": {
+      "types": "./build/phone/index.d.ts",
+      "react-native": "./src/phone/index.ts",
+      "import": "./build/esm/phone/index.mjs",
+      "require": "./build/cjs/phone/index.cjs",
+      "default": "./build/esm/phone/index.mjs"
+    },
     "./input": {
       "types": "./build/input/index.d.ts",
       "react-native": "./src/input/index.ts",
@@ -114,6 +121,8 @@
     "typecheck": "tsc --noEmit",
     "generate:cldr-lite": "node scripts/generate-cldr-lite.js",
     "check:cldr-lite": "node scripts/generate-cldr-lite.js --check",
+    "generate:phone-metadata": "node scripts/generate-phone-metadata.js",
+    "phone:metadata": "node scripts/generate-phone-metadata.js --check && node scripts/check-phone-metadata.js",
     "benchmark": "npm run build && node scripts/benchmark.js",
     "benchmark:report": "npm run --silent build >/dev/null && node scripts/benchmark.js --json",
     "benchmark:budget": "npm run build && node scripts/check-benchmark-budget.js",
@@ -135,7 +144,7 @@
     "skills:install:codex": "node scripts/install-agent-skills.js --target=codex",
     "skills:install:claude": "node scripts/install-agent-skills.js --target=claude",
     "showcase:contract": "node scripts/check-showcase-contract.js",
-    "hardening": "npm run check:cldr-lite && npm run bundle:budget && npm run benchmark:budget && node scripts/check-public-api.js && node scripts/check-value-format-smoke.js && node scripts/check-arithmetic-smoke.js && node scripts/check-currency-registry.js && node scripts/check-unit-registry.js && node scripts/input-replay-smoke.js && node scripts/check-report-contracts.js && npm run docs:check && npm run showcase:contract && npm run skills:check && npm run skills:install:check && npm run example:typecheck && npm run example:doctor && npm run expo:check && npm run example:expo-check && npm run package:smoke && npm run release:check",
+    "hardening": "npm run check:cldr-lite && npm run phone:metadata && npm run bundle:budget && npm run benchmark:budget && node scripts/check-public-api.js && node scripts/check-value-format-smoke.js && node scripts/check-arithmetic-smoke.js && node scripts/check-currency-registry.js && node scripts/check-unit-registry.js && node scripts/input-replay-smoke.js && node scripts/check-report-contracts.js && npm run docs:check && npm run showcase:contract && npm run skills:check && npm run skills:install:check && npm run example:typecheck && npm run example:doctor && npm run expo:check && npm run example:expo-check && npm run package:smoke && npm run release:check",
     "prepare": "expo-module prepare && node scripts/build-package-entrypoints.js",
     "prepublishOnly": "npm run clean && npm run build && npm run typecheck && npm test && npm run hardening",
     "example:install": "npm --prefix example ci",
@@ -174,6 +183,8 @@
     "@types/react": "~19.2.10",
     "expo": "^55.0.23",
     "expo-module-scripts": "^55.0.2",
+    "google-libphonenumber": "^3.2.44",
+    "libphonenumber-js": "^1.13.0",
     "react-native": "0.83.6",
     "typescript": "^6.0.3"
   },

@@ -10,7 +10,7 @@
 
 Production-grade numeric infrastructure for Expo and React Native.
 
-`expo-numerator` provides string-first decimal, money, percent, unit,
+`expo-numerator` provides string-first decimal, money, percent, unit, phone,
 formatting, parsing, and React Native input APIs without silent floating-point
 precision loss.
 
@@ -41,6 +41,7 @@ n.money.format("1234.56", "TRY"); // "₺1.234,56"
 n.money.safeParse("₺1.234,56", "TRY").ok; // true
 n.decimal.add("999.99", "0.01").value; // "1000.00"
 n.unit.formatBestFit("1500", "meter", { scale: 1 }); // "1,5 km"
+n.phone.parse("0501 234 56 78").e164; // "+905012345678"
 ```
 
 Use domain subpaths when a bundle only needs one surface:
@@ -49,9 +50,11 @@ Use domain subpaths when a bundle only needs one surface:
 import { formatMoney } from "expo-numerator/format";
 import { money, toMinorUnits } from "expo-numerator/money";
 import { MoneyInput } from "expo-numerator/input";
+import { parsePhone } from "expo-numerator/phone";
 
 formatMoney(money("1234.56", "TRY"), { locale: "tr-TR" });
 toMinorUnits("12.34", "USD"); // 1234n
+parsePhone("+905012345678").region; // "TR"
 ```
 
 For React Native money input, start with the ready-made component:
@@ -105,15 +108,17 @@ import { resolveLocale } from "expo-numerator/locale";
 import { formatNumber } from "expo-numerator/format";
 import { safeParseNumber } from "expo-numerator/parse";
 import { convertUnit } from "expo-numerator/unit";
+import { parsePhone } from "expo-numerator/phone";
 import { NumberInput } from "expo-numerator/input";
 import { createExpoNumerator } from "expo-numerator/expo";
 ```
 
 ## Status
 
-`0.1.0` includes Foundation+Core, locale, format, parse alpha APIs, React Native
-input APIs, Expo integration helpers, CLDR-lite generated locale data, domain
-subpath exports, package smoke checks, and release hardening.
+`0.1.1` includes Foundation+Core, locale, format, parse alpha APIs, phone APIs,
+React Native input APIs, Expo integration helpers, generated locale data,
+global generated phone metadata, domain subpath exports, package smoke checks,
+and release hardening.
 
 ## Development
 

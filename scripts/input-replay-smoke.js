@@ -157,6 +157,51 @@ const scenarios = [
       errorCode: null,
     },
   },
+  {
+    name: "phone profile keeps partial international draft valid",
+    profile: {
+      type: "phone",
+      options: { defaultRegion: "TR" },
+    },
+    steps: [{ type: "phoneTextChange", text: "+90" }],
+    expected: {
+      text: "+90",
+      value: null,
+      selection: { start: 3, end: 3 },
+      isValid: true,
+      errorCode: null,
+    },
+  },
+  {
+    name: "phone profile emits mobile e164 value",
+    profile: {
+      type: "phone",
+      options: { defaultRegion: "TR" },
+    },
+    steps: [{ type: "phoneTextChange", text: "05012345678" }],
+    expected: {
+      text: "0501 234 56 78",
+      value: "+905012345678",
+      selection: { start: 14, end: 14 },
+      isValid: true,
+      errorCode: null,
+    },
+  },
+  {
+    name: "phone max profile applies NANP as-you-type punctuation",
+    profile: {
+      type: "phone",
+      options: { defaultRegion: "US", metadataProfile: "max" },
+    },
+    steps: [{ type: "phoneTextChange", text: "2015550123" }],
+    expected: {
+      text: "(201) 555-0123",
+      value: "+12015550123",
+      selection: { start: 14, end: 14 },
+      isValid: true,
+      errorCode: null,
+    },
+  },
 ];
 
 function main() {
@@ -178,16 +223,22 @@ function replayScenario(scenario) {
   const options = getScenarioOptions(scenario);
   let state = scenario.initial
     ? numerator.applyNumberInputText(
-        numerator.createNumberInputState(options),
+        createScenarioInputState(scenario, options),
         scenario.initial.text,
         scenario.initial.selection,
         options,
       )
-    : numerator.createNumberInputState(options);
+    : createScenarioInputState(scenario, options);
 
   for (const step of scenario.steps) {
     if (step.type === "nativeTextChange") {
       state = numerator.applyNumberInputNativeTextChange(
+        state,
+        step.text,
+        options,
+      );
+    } else if (step.type === "phoneTextChange") {
+      state = numerator.applyPhoneInputNativeTextChange(
         state,
         step.text,
         options,
@@ -210,6 +261,14 @@ function replayScenario(scenario) {
     expected: scenario.expected,
     actual: serializeState(state),
   };
+}
+
+function createScenarioInputState(scenario, options) {
+  if (scenario.profile?.type === "phone") {
+    return numerator.createPhoneInputState(options);
+  }
+
+  return numerator.createNumberInputState(options);
 }
 
 function getScenarioOptions(scenario) {
@@ -239,6 +298,10 @@ function getScenarioOptions(scenario) {
     );
   }
 
+  if (scenario.profile.type === "phone") {
+    return scenario.profile.options ?? {};
+  }
+
   throw new Error(`Unknown profile type: ${scenario.profile.type}`);
 }
 
@@ -259,6 +322,10 @@ function getNumericValueText(value) {
 
   if (value.kind === "money") {
     return value.amount;
+  }
+
+  if (value.kind === "phone") {
+    return value.e164;
   }
 
   return value.value;

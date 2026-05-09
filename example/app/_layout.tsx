@@ -22,6 +22,19 @@ export default function RootLayout() {
         <Stack.Screen name="parse" options={{ title: "Parse" }} />
         <Stack.Screen name="errors" options={{ title: "Errors" }} />
         <Stack.Screen name="input" options={{ title: "Input Lab" }} />
+        <Stack.Screen name="phone" options={{ title: "Phone" }} />
+        <Stack.Screen
+          name="phone-country-picker"
+          options={{
+            contentStyle: { backgroundColor: "transparent" },
+            headerLargeTitle: false,
+            headerTransparent: true,
+            presentation: "formSheet",
+            sheetAllowedDetents: [0.6, 0.9],
+            sheetGrabberVisible: true,
+            title: "",
+          }}
+        />
         <Stack.Screen name="expo" options={{ title: "Expo" }} />
         <Stack.Screen name="package" options={{ title: "Package" }} />
         <Stack.Screen name="hardening" options={{ title: "Hardening" }} />

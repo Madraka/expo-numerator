@@ -13,8 +13,8 @@ rules that every domain skill builds on.
 ## Architecture Rules
 
 - Treat `src/core`, `src/money`, `src/rounding`, `src/locale`, `src/format`,
-  `src/parse`, `src/unit`, `src/input`, and `src/expo` as separate domains with
-  explicit public entrypoints.
+  `src/parse`, `src/unit`, `src/phone`, `src/input`, and `src/expo` as separate
+  domains with explicit public entrypoints.
 - Keep core dependency-light. Optional Expo/native features must not be required
   for string value, format, parse, or input configuration APIs.
 - Do not add generic `utils.ts` or `helpers.ts` surfaces. Name files by the

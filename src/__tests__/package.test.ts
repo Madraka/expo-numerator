@@ -44,6 +44,16 @@ describe("public package surface", () => {
       }).value,
     ).toBe("32");
     expect(numerator.createUnitInputOptions("m²").unit).toBe("square-meter");
+    expect(numerator.parsePhone("+905012345678").e164).toBe("+905012345678");
+    expect(numerator.formatPhone("+905012345678", { format: "rfc3966" })).toBe(
+      "tel:+905012345678",
+    );
+    expect(
+      numerator.safeParsePhone("05012345678", { defaultRegion: "TR" }).ok,
+    ).toBe(true);
+    expect(
+      numerator.createPhoneInputState({ defaultRegion: "TR" }).isValid,
+    ).toBe(true);
     expect(numerator.createMoneyInputOptions("JPY").allowDecimal).toBe(false);
     expect(numerator.createPercentInputOptions().mode).toBe("percent");
     expect(numerator.createIntegerInputOptions().allowDecimal).toBe(false);
@@ -51,6 +61,7 @@ describe("public package surface", () => {
     expect(typeof numerator.PercentInput).toBe("object");
     expect(typeof numerator.IntegerInput).toBe("object");
     expect(typeof numerator.UnitInput).toBe("object");
+    expect(typeof numerator.PhoneInput).toBe("object");
     expect(numerator.getRegisteredUnitCodes()).toContain("square-meter");
     expect(numerator.createNumberInputState({ initialValue: "1" }).text).toBe(
       "1",
@@ -88,6 +99,7 @@ describe("public package surface", () => {
     const easy = numerator.createNumerator({ locale: "tr-TR" });
     expect(easy.money.format("1234.56", "TRY")).toBe("₺1.234,56");
     expect(easy.money.parse("₺1.234,56", "TRY").amount).toBe("1234.56");
+    expect(easy.phone.parse("05012345678").e164).toBe("+905012345678");
     expect(easy.input.money("TRY").locale).toBe("tr-TR");
     expect(typeof numerator.NumeratorProvider).toBe("function");
     expect(typeof numerator.useNumerator).toBe("function");
@@ -114,6 +126,7 @@ describe("public package surface", () => {
       "format",
       "parse",
       "unit",
+      "phone",
       "input",
       "expo",
     ]) {

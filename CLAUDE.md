@@ -17,6 +17,7 @@ release automation.
    - `skills/maintainer/expo-numerator-money-input/SKILL.md`
    - `skills/maintainer/expo-numerator-locale-format-parse/SKILL.md`
    - `skills/maintainer/expo-numerator-unit/SKILL.md`
+   - `skills/maintainer/expo-numerator-phone/SKILL.md`
    - `skills/maintainer/expo-numerator-expo-example/SKILL.md`
    - `skills/maintainer/expo-numerator-package-release/SKILL.md`
 4. Use `skills/README.md` as the install and routing index.

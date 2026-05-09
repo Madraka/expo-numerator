@@ -73,7 +73,7 @@ function checkInputReplayReport() {
     failures.push(`input replay report expected at least 10 scenarios, received ${scenarios.length}`);
   }
 
-  for (const type of ["money", "percent", "integer", "unit"]) {
+  for (const type of ["money", "percent", "integer", "unit", "phone"]) {
     if (!profileTypes.has(type)) {
       failures.push(`input replay report missing profile type: ${type}`);
     }

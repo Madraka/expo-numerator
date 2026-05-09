@@ -17,6 +17,7 @@ skills/
     expo-numerator-money-input/
     expo-numerator-locale-format-parse/
     expo-numerator-unit/
+    expo-numerator-phone/
     expo-numerator-expo-example/
     expo-numerator-package-release/
 ```
@@ -34,6 +35,7 @@ skills/
    - `skills/maintainer/expo-numerator-money-input/SKILL.md`
    - `skills/maintainer/expo-numerator-locale-format-parse/SKILL.md`
    - `skills/maintainer/expo-numerator-unit/SKILL.md`
+   - `skills/maintainer/expo-numerator-phone/SKILL.md`
    - `skills/maintainer/expo-numerator-expo-example/SKILL.md`
    - `skills/maintainer/expo-numerator-package-release/SKILL.md`
 

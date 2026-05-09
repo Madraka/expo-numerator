@@ -38,6 +38,8 @@ For Claude sessions, start from `CLAUDE.md`. Both Codex and Claude should use
   `skills/maintainer/expo-numerator-locale-format-parse/SKILL.md`.
 - Measurement values, registry, conversion:
   `skills/maintainer/expo-numerator-unit/SKILL.md`.
+- Phone E.164 values, validation, input, and picker:
+  `skills/maintainer/expo-numerator-phone/SKILL.md`.
 - Expo Router example app and showcase UX:
   `skills/maintainer/expo-numerator-expo-example/SKILL.md`.
 - Package exports, CI, npm, GitHub releases:

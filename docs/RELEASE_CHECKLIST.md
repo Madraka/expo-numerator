@@ -103,7 +103,7 @@ npm pack --dry-run
 4. Run `npm run prepublishOnly`.
 5. Run `npm run release:check`.
 6. Commit the version and release-note changes.
-7. Create and push the matching tag, for example `git tag v0.1.0 && git push origin v0.1.0`.
+7. Create and push the matching tag, for example `git tag v0.1.1 && git push origin v0.1.1`.
 8. Confirm the `Publish` workflow completes and the npm/GitHub release artifacts match.
 
 Required repository secret for token-based npm publishing:
