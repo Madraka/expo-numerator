@@ -9,12 +9,17 @@ import {
   parsePhone,
   safeParsePhone,
   PhoneInput,
+  PhoneOtpInput,
+  usePhoneVerification,
   type PhoneMetadataProfile,
-  type PhoneValue,
   type PhoneInputState,
+  type PhoneVerificationCheckRequest,
+  type PhoneVerificationResendRequest,
+  type PhoneVerificationStartRequest,
+  type PhoneValue,
 } from "expo-numerator";
 import { Link } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import {
@@ -27,6 +32,15 @@ import {
 import { useShowcase } from "../provider";
 import { getDefaultPhoneRegion } from "./phone-utils";
 
+const DEMO_OTP_CODE = "123456";
+const OTP_POLICY = {
+  codeLength: 6,
+  expiresInMs: 2 * 60 * 1000,
+  maxAttempts: 3,
+  maxSends: 3,
+  resendDelayMs: 5 * 1000,
+} as const;
+
 export function PhonePage() {
   const { numerator, phoneRegion, setPhoneRegion } = useShowcase();
   const defaultRegion = getDefaultPhoneRegion(numerator.locale);
@@ -34,6 +48,13 @@ export function PhonePage() {
     useState<PhoneMetadataProfile>("lite");
   const [phoneValue, setPhoneValue] = useState<string | null>(null);
   const [phoneState, setPhoneState] = useState<PhoneInputState | null>(null);
+  const [verificationRequest, setVerificationRequest] =
+    useState<PhoneVerificationStartRequest | null>(null);
+  const [verificationCheckRequest, setVerificationCheckRequest] =
+    useState<PhoneVerificationCheckRequest | null>(null);
+  const [verificationResendRequest, setVerificationResendRequest] =
+    useState<PhoneVerificationResendRequest | null>(null);
+  const [verificationEvent, setVerificationEvent] = useState("ready");
   const activeRegion = phoneRegion ?? defaultRegion;
   const activeCountry = getPhoneCountryMeta(activeRegion, {
     locale: numerator.locale,
@@ -47,20 +68,142 @@ export function PhonePage() {
   });
   const asYouTypeRows = useMemo(
     () => getAsYouTypeRows(activeRegion, metadataProfile),
-    [activeRegion, metadataProfile]
+    [activeRegion, metadataProfile],
   );
   const typeRows = useMemo(
     () => getTypeRows(activeRegion, metadataProfile),
-    [activeRegion, metadataProfile]
+    [activeRegion, metadataProfile],
   );
+  const verificationOptions = useMemo(
+    () => ({
+      phone: parsed,
+      channel: "sms" as const,
+      defaultRegion: activeRegion,
+      metadataProfile,
+      policy: OTP_POLICY,
+      purpose: "signUp" as const,
+    }),
+    [activeRegion, metadataProfile, parsed.e164],
+  );
+  const verification = usePhoneVerification(verificationOptions);
   const countries = useMemo(
     () =>
       getPhoneCountries({
         locale: numerator.locale,
         preferredRegions: [defaultRegion, "US", "GB"],
       }).slice(0, 6),
-    [defaultRegion, numerator.locale]
+    [defaultRegion, numerator.locale],
   );
+
+  useEffect(() => {
+    verification.reset(verificationOptions);
+    setVerificationRequest(null);
+    setVerificationCheckRequest(null);
+    setVerificationResendRequest(null);
+    setVerificationEvent("ready");
+  }, [verification.reset, verificationOptions]);
+
+  const startVerification = () => {
+    const request = verification.createStartRequest({
+      locale: numerator.locale,
+      metadataProfile,
+      idempotencyKey: `start-${parsed.e164}`,
+      rateLimitKey: `phone:${parsed.e164}`,
+      rateLimitScope: {
+        deviceId: "example-device",
+        userAgent: "expo-numerator-showcase",
+      },
+      clientContext: {
+        route: "/phone",
+        sdk: "expo",
+      },
+    });
+
+    setVerificationRequest(request);
+    setVerificationCheckRequest(null);
+    setVerificationResendRequest(null);
+    verification.markSending();
+    verification.applyStart(
+      {
+        sessionId: `demo-${request.phoneE164.slice(-4)}`,
+        maskedDestination: verification.maskedDestination ?? undefined,
+        attemptsRemaining: OTP_POLICY.maxAttempts,
+        sendsRemaining: OTP_POLICY.maxSends - 1,
+      },
+      { policy: OTP_POLICY },
+    );
+    setVerificationEvent("sent");
+  };
+
+  const submitVerification = () => {
+    if (!verification.canSubmit) {
+      verification.markChecking();
+      setVerificationEvent("code_required");
+      return;
+    }
+
+    const checkRequest = verification.createCheckRequest({
+      idempotencyKey: `check-${verification.sessionId}`,
+      rateLimitKey: `session:${verification.sessionId}`,
+      rateLimitScope: {
+        deviceId: "example-device",
+        userAgent: "expo-numerator-showcase",
+      },
+    });
+
+    setVerificationCheckRequest(checkRequest);
+    verification.markChecking();
+    verification.applyCheck(
+      verification.code === DEMO_OTP_CODE
+        ? {
+            status: "verified",
+            attemptsRemaining: verification.attemptsRemaining ?? undefined,
+          }
+        : {
+            status: "invalid",
+            attemptsRemaining: Math.max(
+              0,
+              (verification.attemptsRemaining ?? OTP_POLICY.maxAttempts) - 1,
+            ),
+          }
+    );
+    setVerificationEvent(
+      verification.code === DEMO_OTP_CODE ? "verified" : "invalid_code",
+    );
+  };
+
+  const resendVerification = () => {
+    if (verification.sessionId === null) {
+      setVerificationEvent("session_required");
+      return;
+    }
+
+    const resendRequest = verification.createResendRequest({
+      locale: numerator.locale,
+      metadataProfile,
+      idempotencyKey: `resend-${verification.sessionId}`,
+      rateLimitKey: `resend:${verification.sessionId}`,
+      rateLimitScope: {
+        deviceId: "example-device",
+        userAgent: "expo-numerator-showcase",
+      },
+    });
+
+    setVerificationResendRequest(resendRequest);
+    verification.applyResend(
+      {
+        sessionId: verification.sessionId ?? `demo-${parsed.e164.slice(-4)}`,
+        maskedDestination: verification.maskedDestination ?? undefined,
+        attemptsRemaining: OTP_POLICY.maxAttempts,
+        sendsRemaining: Math.max(
+          0,
+          (verification.sendsRemaining ?? OTP_POLICY.maxSends) - 1,
+        ),
+      },
+      { now: Date.now() + OTP_POLICY.resendDelayMs, policy: OTP_POLICY },
+    );
+    setVerificationEvent("resent");
+  };
 
   return (
     <PageScaffold
@@ -148,6 +291,101 @@ export function PhonePage() {
         </DataLine>
       </Section>
 
+      <Section title="OTP verification">
+        <PhoneOtpInput
+          verificationState={verification}
+          onComplete={() => setVerificationEvent("code_complete")}
+          onVerificationStateChange={(state) =>
+            verification.setCode(state.code)
+          }
+          placeholder={DEMO_OTP_CODE}
+          style={showcaseStyles.input}
+          testID="expo-numerator-phone-otp-input"
+        />
+        <View style={styles.otpActions}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={startVerification}
+            style={styles.otpButton}
+            testID="expo-numerator-phone-otp-start"
+          >
+            <Text style={styles.otpButtonText}>Start SMS</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={submitVerification}
+            style={styles.otpButton}
+            testID="expo-numerator-phone-otp-submit"
+          >
+            <Text style={styles.otpButtonText}>Check code</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={resendVerification}
+            style={styles.otpButtonSecondary}
+            testID="expo-numerator-phone-otp-resend"
+          >
+            <Text style={styles.otpButtonSecondaryText}>Resend</Text>
+          </Pressable>
+        </View>
+        <DataTable
+          rows={[
+            ["demo code", DEMO_OTP_CODE],
+            ["status", verification.status],
+            ["session", verification.sessionId ?? "none"],
+            ["masked destination", verification.maskedDestination ?? "none"],
+            [
+              "code length",
+              `${verification.code.length}/${verification.codeLength}`,
+            ],
+            ["can submit", String(verification.canSubmit)],
+            ["can resend", String(verification.canResend())],
+            ["event", verificationEvent],
+          ]}
+        />
+        <DataLine testID="expo-numerator-phone-otp-state">
+          {`status=${verification.status} code=${verification.code.length}/${verification.codeLength} attempts=${verification.attemptsRemaining ?? "n/a"} sends=${verification.sendsRemaining ?? "n/a"}`}
+        </DataLine>
+        <DataLine testID="expo-numerator-phone-otp-request">
+          {verificationRequest
+            ? `start phoneE164=${verificationRequest.phoneE164} channel=${verificationRequest.channel} purpose=${verificationRequest.purpose} rate=${verificationRequest.rateLimitKey ?? "default"}`
+            : "request=not sent"}
+        </DataLine>
+        <DataLine testID="expo-numerator-phone-otp-check-request">
+          {verificationCheckRequest
+            ? `check session=${verificationCheckRequest.sessionId} codeLength=${verificationCheckRequest.code.length} rate=${verificationCheckRequest.rateLimitKey ?? "default"}`
+            : "check=not sent"}
+        </DataLine>
+        <DataLine testID="expo-numerator-phone-otp-resend-request">
+          {verificationResendRequest
+            ? `resend session=${verificationResendRequest.sessionId} channel=${verificationResendRequest.channel} rate=${verificationResendRequest.rateLimitKey ?? "default"}`
+            : "resend=not sent"}
+        </DataLine>
+        <DataTable
+          rows={[
+            [
+              "client sends",
+              "start/check/resend request payloads with idempotency and rate-limit keys",
+            ],
+            [
+              "server returns",
+              "sessionId, maskedDestination, expiry, resend and attempt counters",
+            ],
+            [
+              "server keeps",
+              "OTP secret, provider credentials, rate limits, fraud rules, user binding",
+            ],
+            [
+              "short code",
+              "4 digits require allowShortCode; keep sensitive flows at 6+",
+            ],
+          ]}
+        />
+        <DataLine testID="expo-numerator-phone-otp-provider-contract">
+          client=contract only | server=secret delivery ownership
+        </DataLine>
+      </Section>
+
       <Section title="As-you-type parity">
         <DataTable rows={asYouTypeRows} />
         <DataLine testID="expo-numerator-phone-asyoutype">
@@ -216,7 +454,7 @@ export function PhonePage() {
                 numerator.phone.safeParse("02123456789", {
                   defaultRegion: "TR",
                   validationMode: "possible",
-                }).ok
+                }).ok,
               ),
             ],
             [
@@ -224,7 +462,7 @@ export function PhonePage() {
               String(
                 numerator.phone.safeParse("05012345678", {
                   defaultRegion: "TR",
-                }).ok
+                }).ok,
               ),
             ],
             [
@@ -232,14 +470,16 @@ export function PhonePage() {
               String(
                 numerator.phone.safeParse("02123456789", {
                   defaultRegion: "TR",
-                }).ok
+                }).ok,
               ),
             ],
             ["NANP ambiguity", getNanpAmbiguityRegions()],
             [
               "non-geographic hidden",
               String(
-                getPhoneCountries().some((country) => country.region === "001")
+                getPhoneCountries().some(
+                  (country) => country.region === "001",
+                ),
               ),
             ],
           ]}
@@ -349,6 +589,35 @@ const styles = StyleSheet.create({
     color: "#0B6E99",
     fontSize: 14,
     fontWeight: "800",
+  },
+  otpActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  otpButton: {
+    backgroundColor: "#102A43",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  otpButtonText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "900",
+  },
+  otpButtonSecondary: {
+    backgroundColor: "#E9F2FF",
+    borderColor: "#A8CBFF",
+    borderRadius: 8,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  otpButtonSecondaryText: {
+    color: "#154EB8",
+    fontSize: 13,
+    fontWeight: "900",
   },
   countryPreview: {
     flexDirection: "row",

@@ -54,6 +54,12 @@ describe("public package surface", () => {
     expect(
       numerator.createPhoneInputState({ defaultRegion: "TR" }).isValid,
     ).toBe(true);
+    expect(typeof numerator.createPhoneVerificationCheckRequest).toBe(
+      "function",
+    );
+    expect(typeof numerator.createPhoneVerificationResendRequest).toBe(
+      "function",
+    );
     expect(numerator.createMoneyInputOptions("JPY").allowDecimal).toBe(false);
     expect(numerator.createPercentInputOptions().mode).toBe("percent");
     expect(numerator.createIntegerInputOptions().allowDecimal).toBe(false);
@@ -62,6 +68,7 @@ describe("public package surface", () => {
     expect(typeof numerator.IntegerInput).toBe("object");
     expect(typeof numerator.UnitInput).toBe("object");
     expect(typeof numerator.PhoneInput).toBe("object");
+    expect(typeof numerator.PhoneOtpInput).toBe("object");
     expect(numerator.getRegisteredUnitCodes()).toContain("square-meter");
     expect(numerator.createNumberInputState({ initialValue: "1" }).text).toBe(
       "1",
@@ -93,6 +100,7 @@ describe("public package surface", () => {
     ).toEqual({ start: 0, end: 1 });
     expect(typeof numerator.NumberInput).toBe("object");
     expect(typeof numerator.useNumberInput).toBe("function");
+    expect(typeof numerator.usePhoneVerification).toBe("function");
     expect(numerator.createExpoNumerator({ locale: "tr-TR" }).locale).toBe(
       "tr-TR",
     );

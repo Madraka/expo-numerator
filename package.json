@@ -1,6 +1,6 @@
 {
   "name": "expo-numerator",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Production-grade numeric infrastructure for Expo and React Native.",
   "main": "build/cjs/index.cjs",
   "module": "build/esm/index.mjs",

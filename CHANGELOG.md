@@ -10,6 +10,33 @@
 
 ### 💡 Others
 
+## 0.1.2 - 2026-05-10
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+- Added provider-independent phone verification state and server contract
+  helpers for OTP flows without bundling SMS provider logic or credentials.
+- Added styles-free `PhoneOtpInput` and `usePhoneVerification` surfaces for
+  React Native OTP entry without coupling the package to an SMS provider.
+- Expanded the `/phone` showcase with a simulated OTP verification flow,
+  backend/provider contract table, and stable selectors for device smoke tests.
+- Added provider-independent phone verification check/resend request helpers
+  with idempotency, rate-limit keys, scoped rate-limit fields, and non-secret
+  client context.
+- Bounded phone verification policy values to safer OTP defaults, including a
+  six-digit default minimum, explicit `allowShortCode` opt-in for four-digit
+  compatibility flows, 10-minute maximum validity window, resend-delay floor,
+  and NIST-aligned failed-attempt upper bound.
+
+### 🐛 Bug fixes
+
+- Prevented duplicate `PhoneOtpInput` completion callbacks when controlled
+  state updates follow a completed code entry.
+
+### 💡 Others
+
 ## 0.1.1 - 2026-05-09
 
 ### 🛠 Breaking changes

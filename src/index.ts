@@ -178,61 +178,7 @@ export type {
   UnitMeta,
   UnitRegistration,
 } from "./unit/unitMeta";
-export { PhoneCountryPicker } from "./phone/PhoneCountryPicker";
-export type { PhoneCountryPickerProps } from "./phone/PhoneCountryPicker";
-export { PhoneInput } from "./phone/PhoneInput";
-export type { PhoneInputProps } from "./phone/PhoneInput";
-export { formatPhone } from "./phone/formatPhone";
-export {
-  getCountryCallingCode,
-  getPhoneCountries,
-  getPhoneCountryMeta,
-  getPhoneExampleNumber,
-  getPhoneMetadataInfo,
-} from "./phone/phoneRegistry";
-export { phone, safePhone } from "./phone/phone";
-export {
-  isMobileEligiblePhoneNumber,
-  isPossiblePhoneNumber,
-  isValidPhoneNumber,
-  normalizePhoneText,
-  parsePhone,
-  safeParsePhone,
-} from "./phone/parsePhone";
-export {
-  applyPhoneInputNativeTextChange,
-  applyPhoneInputText,
-  blurPhoneInputState,
-  commitPhoneInputState,
-  createPhoneInputState,
-  focusPhoneInputState,
-  resetPhoneInputState,
-  sanitizePhoneInputText,
-  setPhoneInputCountry,
-  setPhoneInputSelection,
-} from "./phone/phoneInputState";
-export type {
-  PhoneCountryListOptions,
-  PhoneCountryMeta,
-  PhoneDefaultRegion,
-  PhoneExampleType,
-  PhoneFormat,
-  PhoneFormatOptions,
-  PhoneInputOptions,
-  PhoneInputSelectionEvent,
-  PhoneInputState,
-  PhoneInputTextInputProps,
-  PhoneMetadataInfo,
-  PhoneMetadataProfile,
-  PhoneNumberType,
-  PhoneParseOptions,
-  PhoneRegionCode,
-  PhoneTextSelection,
-  PhoneValidationMode,
-  PhoneValue,
-  UsePhoneInputResult,
-} from "./phone/phoneTypes";
-export { usePhoneInput } from "./phone/usePhoneInput";
+export * from "./phone/index";
 export {
   applyNumberInputEdit,
   applyNumberInputNativeTextChange,

@@ -106,6 +106,30 @@ import type {
   PhoneCountryListOptions,
   PhoneParseOptions,
 } from "../phone/phoneTypes";
+import {
+  applyPhoneVerificationCheck,
+  applyPhoneVerificationResend,
+  applyPhoneVerificationStart,
+  canResendPhoneVerification,
+  canSubmitPhoneVerification,
+  cancelPhoneVerificationState,
+  createPhoneVerificationCheckRequest,
+  createPhoneVerificationResendRequest,
+  createPhoneVerificationStartRequest,
+  createPhoneVerificationState,
+  expirePhoneVerificationState,
+  markPhoneVerificationChecking,
+  markPhoneVerificationSending,
+  maskPhoneForVerification,
+  setPhoneVerificationCode,
+} from "../phone/phoneVerificationState";
+import type {
+  PhoneVerificationCheckRequest,
+  PhoneVerificationRequestOptions,
+  PhoneVerificationResendRequest,
+  PhoneVerificationState,
+  PhoneVerificationStateOptions,
+} from "../phone/verificationTypes";
 import { roundDecimal } from "../rounding/roundDecimal";
 import { convertUnit } from "../unit/convertUnit";
 import {
@@ -308,6 +332,25 @@ export type NumeratorFacade = {
     getCountry: typeof getPhoneCountryMeta;
     example: typeof getPhoneExampleNumber;
     metadata: typeof getPhoneMetadataInfo;
+    verification: {
+      create: (
+        options?: PhoneVerificationStateOptions,
+      ) => ReturnType<typeof createPhoneVerificationState>;
+      startRequest: typeof createPhoneVerificationStartRequest;
+      checkRequest: typeof createPhoneVerificationCheckRequest;
+      resendRequest: typeof createPhoneVerificationResendRequest;
+      sending: typeof markPhoneVerificationSending;
+      started: typeof applyPhoneVerificationStart;
+      code: typeof setPhoneVerificationCode;
+      checking: typeof markPhoneVerificationChecking;
+      checked: typeof applyPhoneVerificationCheck;
+      resent: typeof applyPhoneVerificationResend;
+      expire: typeof expirePhoneVerificationState;
+      cancel: typeof cancelPhoneVerificationState;
+      canSubmit: typeof canSubmitPhoneVerification;
+      canResend: typeof canResendPhoneVerification;
+      mask: typeof maskPhoneForVerification;
+    };
   };
   input: {
     state: typeof createNumberInputState;
@@ -625,6 +668,51 @@ export function createNumerator(
       getCountry: getPhoneCountryMeta,
       example: getPhoneExampleNumber,
       metadata: getPhoneMetadataInfo,
+      verification: Object.freeze({
+        create(verificationOptions = {}) {
+          return createPhoneVerificationState(
+            withPhoneDefaults(verificationOptions, locale),
+          );
+        },
+        startRequest(
+          state: PhoneVerificationState,
+          requestOptions: PhoneVerificationRequestOptions = {},
+        ) {
+          return createPhoneVerificationStartRequest(state, {
+            ...requestOptions,
+            locale: requestOptions.locale ?? locale,
+          });
+        },
+        checkRequest(
+          state: PhoneVerificationState,
+          requestOptions: Omit<
+            PhoneVerificationRequestOptions,
+            "locale" | "metadataProfile"
+          > = {},
+        ): PhoneVerificationCheckRequest {
+          return createPhoneVerificationCheckRequest(state, requestOptions);
+        },
+        resendRequest(
+          state: PhoneVerificationState,
+          requestOptions: PhoneVerificationRequestOptions = {},
+        ): PhoneVerificationResendRequest {
+          return createPhoneVerificationResendRequest(state, {
+            ...requestOptions,
+            locale: requestOptions.locale ?? locale,
+          });
+        },
+        sending: markPhoneVerificationSending,
+        started: applyPhoneVerificationStart,
+        code: setPhoneVerificationCode,
+        checking: markPhoneVerificationChecking,
+        checked: applyPhoneVerificationCheck,
+        resent: applyPhoneVerificationResend,
+        expire: expirePhoneVerificationState,
+        cancel: cancelPhoneVerificationState,
+        canSubmit: canSubmitPhoneVerification,
+        canResend: canResendPhoneVerification,
+        mask: maskPhoneForVerification,
+      }),
     }),
     input: Object.freeze({
       state: createNumberInputState,
@@ -662,7 +750,10 @@ export function createNumerator(
 }
 
 function withPhoneDefaults<
-  TOptions extends PhoneInputOptions | PhoneParseOptions,
+  TOptions extends
+    | PhoneInputOptions
+    | PhoneParseOptions
+    | PhoneVerificationStateOptions,
 >(options: TOptions, locale: string): TOptions {
   return {
     ...options,

@@ -106,7 +106,10 @@ const distance = n.unit.create("1500", "meter");
 n.unit.format(distance); // "1.500 m" in tr-TR
 n.unit.formatBestFit(distance, { scale: 1 }); // "1,5 km"
 n.unit.convert(distance, "kilometer", { scale: 2 }).value; // "1.50"
-n.unit.convertForLocale(n.unit.create("1", "bar"), { locale: "en-US", scale: 4 });
+n.unit.convertForLocale(n.unit.create("1", "bar"), {
+  locale: "en-US",
+  scale: 4,
+});
 ```
 
 Use canonical units for storage and convert only at display or input boundaries.
@@ -136,6 +139,71 @@ display. Phone formatting is region-based, while locale affects country picker
 labels. `getPhoneMetadataInfo("lite" | "mobile" | "max")` exposes the ITU E.164
 and libphonenumber source snapshot plus profile size hints. Use `max` when you
 need stricter type/format parity; keep `lite` or `mobile` for default app input.
+
+Phone verification helpers only model the client-side state, OTP entry, and
+server contract:
+
+```tsx
+import { PhoneOtpInput, usePhoneVerification } from "expo-numerator/phone";
+
+const verification = n.phone.verification.create({
+  phone: "+905012345678",
+  channel: "sms",
+  purpose: "signUp",
+});
+const request = n.phone.verification.startRequest(verification);
+const sent = n.phone.verification.started(verification, {
+  sessionId: "ver_123",
+  maskedDestination: "+905*******78",
+  attemptsRemaining: 3,
+  sendsRemaining: 2,
+});
+const withCode = n.phone.verification.code(sent, "123456");
+const checkRequest = n.phone.verification.checkRequest(withCode, {
+  idempotencyKey: "check-ver_123",
+  rateLimitKey: "session:ver_123",
+  rateLimitScope: {
+    userId: "user_123",
+    deviceId: "device_123",
+  },
+});
+const resendRequest = n.phone.verification.resendRequest(sent, {
+  idempotencyKey: "resend-ver_123",
+  rateLimitKey: "phone:+905012345678",
+});
+
+function OtpStep() {
+  const otp = usePhoneVerification({
+    phone: "+905012345678",
+    channel: "sms",
+    purpose: "signUp",
+  });
+
+  return (
+    <PhoneOtpInput
+      verificationState={otp}
+      onVerificationStateChange={(state) => otp.setCode(state.code)}
+      onComplete={(code) => {
+        code; // send with your backend verification session id
+      }}
+    />
+  );
+}
+```
+
+Send `request`, `checkRequest`, and `resendRequest` to your backend. Use
+`PhoneOtpInput` when you want a styles-free React Native OTP field, or
+`usePhoneVerification().inputProps` when composing your own input. OTP
+generation, one-time replay protection, delivery provider credentials,
+fraud/rate limits, and ownership binding must stay server-side. The backend
+should return only non-secret verification state such as `sessionId`,
+`maskedDestination`, expiry, resend cooldown, and remaining attempt counters.
+Use `idempotencyKey`, `rateLimitKey`, and `rateLimitScope` to connect the client
+contract to provider or backend throttling without putting secrets in the app.
+OTP length defaults to a six-digit minimum. Set
+`policy: { allowShortCode: true, codeLength: 4 }` only for low-assurance or
+provider-compatibility flows; keep MFA, recovery, and phone-change verification
+on six or more digits.
 
 ## Digit Normalization
 

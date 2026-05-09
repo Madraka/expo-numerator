@@ -2,6 +2,8 @@ export { PhoneCountryPicker } from "./PhoneCountryPicker";
 export type { PhoneCountryPickerProps } from "./PhoneCountryPicker";
 export { PhoneInput } from "./PhoneInput";
 export type { PhoneInputProps } from "./PhoneInput";
+export { PhoneOtpInput } from "./PhoneOtpInput";
+export type { PhoneOtpInputProps } from "./PhoneOtpInput";
 export { formatPhone } from "./formatPhone";
 export {
   getCountryCallingCode,
@@ -19,6 +21,23 @@ export {
   parsePhone,
   safeParsePhone,
 } from "./parsePhone";
+export {
+  applyPhoneVerificationCheck,
+  applyPhoneVerificationResend,
+  applyPhoneVerificationStart,
+  canResendPhoneVerification,
+  canSubmitPhoneVerification,
+  cancelPhoneVerificationState,
+  createPhoneVerificationCheckRequest,
+  createPhoneVerificationResendRequest,
+  createPhoneVerificationStartRequest,
+  createPhoneVerificationState,
+  expirePhoneVerificationState,
+  markPhoneVerificationChecking,
+  markPhoneVerificationSending,
+  maskPhoneForVerification,
+  setPhoneVerificationCode,
+} from "./phoneVerificationState";
 export {
   applyPhoneInputNativeTextChange,
   applyPhoneInputText,
@@ -52,4 +71,25 @@ export type {
   PhoneValue,
   UsePhoneInputResult,
 } from "./phoneTypes";
+export type {
+  PhoneVerificationChannel,
+  PhoneVerificationCheckRequest,
+  PhoneVerificationCheckResponse,
+  PhoneVerificationClientContext,
+  PhoneVerificationError,
+  PhoneVerificationErrorCode,
+  PhoneVerificationPolicy,
+  PhoneVerificationPurpose,
+  PhoneVerificationRateLimitScope,
+  PhoneVerificationRequestOptions,
+  PhoneVerificationResendRequest,
+  PhoneVerificationResendResponse,
+  PhoneVerificationStartRequest,
+  PhoneVerificationStartResponse,
+  PhoneVerificationState,
+  PhoneVerificationStateOptions,
+  PhoneVerificationStatus,
+  UsePhoneVerificationResult,
+} from "./verificationTypes";
 export { usePhoneInput } from "./usePhoneInput";
+export { usePhoneVerification } from "./usePhoneVerification";

@@ -29,6 +29,13 @@
   "expo": {
     "autolinking": {
       "nativeModulesDir": ".."
+    },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "expo-numerator"
+        ]
+      }
     }
   }
 }

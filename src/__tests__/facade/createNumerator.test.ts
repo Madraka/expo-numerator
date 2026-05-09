@@ -39,4 +39,32 @@ describe("createNumerator", () => {
     );
     expect(numerator.locales.normalizeDigits("١٢٣")).toBe("123");
   });
+
+  it("exposes locale-bound phone verification primitives without provider coupling", () => {
+    const numerator = createNumerator({ locale: "tr-TR" });
+    const state = numerator.phone.verification.create({
+      phone: "05012345678",
+      channel: "sms",
+      purpose: "signUp",
+    });
+    const request = numerator.phone.verification.startRequest(state);
+    const sent = numerator.phone.verification.started(
+      numerator.phone.verification.sending(state),
+      { sessionId: "ver_facade" },
+      { now: 1_000 },
+    );
+    const withCode = numerator.phone.verification.code(sent, "123456");
+    const checkRequest = numerator.phone.verification.checkRequest(withCode, {
+      rateLimitScope: { userId: "user_facade" },
+    });
+    const resendRequest = numerator.phone.verification.resendRequest(sent);
+
+    expect(request.phoneE164).toBe("+905012345678");
+    expect(request.locale).toBe("tr-TR");
+    expect(checkRequest.sessionId).toBe("ver_facade");
+    expect(checkRequest.rateLimitScope?.userId).toBe("user_facade");
+    expect(resendRequest.locale).toBe("tr-TR");
+    expect(sent.status).toBe("sent");
+    expect(numerator.phone.verification.canSubmit(withCode)).toBe(true);
+  });
 });

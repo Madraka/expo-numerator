@@ -21,6 +21,7 @@ const requiredRuntimeExports = [
   "PercentInput",
   "PhoneCountryPicker",
   "PhoneInput",
+  "PhoneOtpInput",
   "UnitInput",
   "addDecimal",
   "allocateMinorUnits",
@@ -30,8 +31,14 @@ const requiredRuntimeExports = [
   "applyNumberInputText",
   "applyPhoneInputNativeTextChange",
   "applyPhoneInputText",
+  "applyPhoneVerificationCheck",
+  "applyPhoneVerificationResend",
+  "applyPhoneVerificationStart",
   "blurPhoneInputState",
   "canConvertUnit",
+  "canResendPhoneVerification",
+  "canSubmitPhoneVerification",
+  "cancelPhoneVerificationState",
   "commitNumberInputState",
   "commitPhoneInputState",
   "compareDecimal",
@@ -44,6 +51,10 @@ const requiredRuntimeExports = [
   "createNumerator",
   "createNumberInputState",
   "createPhoneInputState",
+  "createPhoneVerificationCheckRequest",
+  "createPhoneVerificationResendRequest",
+  "createPhoneVerificationStartRequest",
+  "createPhoneVerificationState",
   "createPercentInputOptions",
   "createUnitInputOptions",
   "decimal",
@@ -62,6 +73,7 @@ const requiredRuntimeExports = [
   "formatUnitBestFit",
   "formatUnitForLocale",
   "fromMinorUnits",
+  "expirePhoneVerificationState",
   "getCurrencyMeta",
   "getExpoLocalizationInfo",
   "getLocaleSymbols",
@@ -100,6 +112,9 @@ const requiredRuntimeExports = [
   "isUnit",
   "isUnitCode",
   "isWithinRange",
+  "markPhoneVerificationChecking",
+  "markPhoneVerificationSending",
+  "maskPhoneForVerification",
   "money",
   "normalizePhoneText",
   "multiplyDecimal",
@@ -138,12 +153,14 @@ const requiredRuntimeExports = [
   "setNumberInputSelection",
   "setPhoneInputCountry",
   "setPhoneInputSelection",
+  "setPhoneVerificationCode",
   "subtractDecimal",
   "toMinorUnits",
   "toggleNumberInputSign",
   "unit",
   "useNumberInput",
   "usePhoneInput",
+  "usePhoneVerification",
   "useNumerator",
   "validateGrouping",
 ];
@@ -218,6 +235,7 @@ const requiredTypeExports = [
   "PhoneFormatOptions",
   "PhoneInputOptions",
   "PhoneInputProps",
+  "PhoneOtpInputProps",
   "PhoneInputSelectionEvent",
   "PhoneInputState",
   "PhoneInputTextInputProps",
@@ -229,6 +247,24 @@ const requiredTypeExports = [
   "PhoneTextSelection",
   "PhoneValidationMode",
   "PhoneValue",
+  "PhoneVerificationChannel",
+  "PhoneVerificationCheckRequest",
+  "PhoneVerificationCheckResponse",
+  "PhoneVerificationClientContext",
+  "PhoneVerificationError",
+  "PhoneVerificationErrorCode",
+  "PhoneVerificationPolicy",
+  "PhoneVerificationPurpose",
+  "PhoneVerificationRateLimitScope",
+  "PhoneVerificationRequestOptions",
+  "PhoneVerificationResendRequest",
+  "PhoneVerificationResendResponse",
+  "PhoneVerificationStartRequest",
+  "PhoneVerificationStartResponse",
+  "PhoneVerificationState",
+  "PhoneVerificationStateOptions",
+  "PhoneVerificationStatus",
+  "UsePhoneVerificationResult",
   "ResolveLocaleOptions",
   "RoundDecimalOptions",
   "RoundingMode",
@@ -353,10 +389,22 @@ const requiredSubpathRuntimeExports = {
   phone: [
     "PhoneCountryPicker",
     "PhoneInput",
+    "PhoneOtpInput",
+    "applyPhoneVerificationCheck",
+    "applyPhoneVerificationResend",
+    "applyPhoneVerificationStart",
     "applyPhoneInputNativeTextChange",
     "applyPhoneInputText",
     "blurPhoneInputState",
+    "canResendPhoneVerification",
+    "canSubmitPhoneVerification",
+    "cancelPhoneVerificationState",
     "commitPhoneInputState",
+    "createPhoneVerificationCheckRequest",
+    "createPhoneVerificationResendRequest",
+    "createPhoneVerificationStartRequest",
+    "createPhoneVerificationState",
+    "expirePhoneVerificationState",
     "createPhoneInputState",
     "focusPhoneInputState",
     "formatPhone",
@@ -368,6 +416,9 @@ const requiredSubpathRuntimeExports = {
     "isMobileEligiblePhoneNumber",
     "isPossiblePhoneNumber",
     "isValidPhoneNumber",
+    "markPhoneVerificationChecking",
+    "markPhoneVerificationSending",
+    "maskPhoneForVerification",
     "normalizePhoneText",
     "parsePhone",
     "phone",
@@ -377,7 +428,9 @@ const requiredSubpathRuntimeExports = {
     "sanitizePhoneInputText",
     "setPhoneInputCountry",
     "setPhoneInputSelection",
+    "setPhoneVerificationCode",
     "usePhoneInput",
+    "usePhoneVerification",
   ],
   input: [
     "IntegerInput",
@@ -494,6 +547,7 @@ const requiredSubpathTypeExports = {
     "PhoneFormatOptions",
     "PhoneInputOptions",
     "PhoneInputProps",
+    "PhoneOtpInputProps",
     "PhoneInputSelectionEvent",
     "PhoneInputState",
     "PhoneInputTextInputProps",
@@ -505,6 +559,24 @@ const requiredSubpathTypeExports = {
     "PhoneTextSelection",
     "PhoneValidationMode",
     "PhoneValue",
+    "PhoneVerificationChannel",
+    "PhoneVerificationCheckRequest",
+    "PhoneVerificationCheckResponse",
+    "PhoneVerificationClientContext",
+    "PhoneVerificationError",
+    "PhoneVerificationErrorCode",
+    "PhoneVerificationPolicy",
+    "PhoneVerificationPurpose",
+    "PhoneVerificationRateLimitScope",
+    "PhoneVerificationRequestOptions",
+    "PhoneVerificationResendRequest",
+    "PhoneVerificationResendResponse",
+    "PhoneVerificationStartRequest",
+    "PhoneVerificationStartResponse",
+    "PhoneVerificationState",
+    "PhoneVerificationStateOptions",
+    "PhoneVerificationStatus",
+    "UsePhoneVerificationResult",
     "UsePhoneInputResult",
   ],
   input: [
@@ -594,7 +666,9 @@ function checkRuntimeExports(label, exportsList) {
 
   for (const exportName of exportsList) {
     if (!requiredRuntimeExports.includes(exportName)) {
-      failures.push(`${label} contains unmanifested runtime export: ${exportName}`);
+      failures.push(
+        `${label} contains unmanifested runtime export: ${exportName}`,
+      );
     }
   }
 
@@ -629,7 +703,12 @@ async function checkSubpathExports() {
   )) {
     const cjsFile = path.join(repoRoot, "build/cjs", subpath, "index.cjs");
     const esmFile = path.join(repoRoot, "build/esm", subpath, "index.mjs");
-    const declarationsFile = path.join(repoRoot, "build", subpath, "index.d.ts");
+    const declarationsFile = path.join(
+      repoRoot,
+      "build",
+      subpath,
+      "index.d.ts",
+    );
 
     for (const file of [cjsFile, esmFile, declarationsFile]) {
       if (!fs.existsSync(file)) {
@@ -681,7 +760,9 @@ function checkExactSubpathRuntimeExports(label, exportsList, expectedExports) {
 
   for (const exportName of exportsList) {
     if (!expectedSet.has(exportName)) {
-      failures.push(`${label} contains unmanifested runtime export: ${exportName}`);
+      failures.push(
+        `${label} contains unmanifested runtime export: ${exportName}`,
+      );
     }
   }
 
@@ -699,7 +780,9 @@ function checkSubpathTypeExports(subpath, declarations, expectedTypeExports) {
 
   for (const forbiddenExport of forbiddenExports) {
     if (hasDeclarationExport(declarations, forbiddenExport)) {
-      failures.push(`${subpath} d.ts contains forbidden export: ${forbiddenExport}`);
+      failures.push(
+        `${subpath} d.ts contains forbidden export: ${forbiddenExport}`,
+      );
     }
   }
 
@@ -778,7 +861,37 @@ function checkPackageMetadata() {
 }
 
 function hasDeclarationExport(declarations, exportName) {
+  if (hasDeclarationName(declarations, exportName)) {
+    return true;
+  }
+
+  for (const match of declarations.matchAll(/export \* from "([^"]+)";/g)) {
+    const reexportPath = getDeclarationReexportPath(match[1]);
+
+    if (
+      reexportPath !== null &&
+      fs.existsSync(reexportPath) &&
+      hasDeclarationName(fs.readFileSync(reexportPath, "utf8"), exportName)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function hasDeclarationName(declarations, exportName) {
   return new RegExp(`\\b${escapeRegExp(exportName)}\\b`).test(declarations);
+}
+
+function getDeclarationReexportPath(specifier) {
+  if (!specifier.startsWith("./")) {
+    return null;
+  }
+
+  const normalized = specifier.slice(2).replace(/\/index$/, "/index.d.ts");
+
+  return path.join(repoRoot, "build", normalized);
 }
 
 function escapeRegExp(value) {

@@ -29,7 +29,8 @@ Facade domains:
 - `percent`: create, safe, format, parse, safeParse, input.
 - `unit`: create, safe, format, formatForLocale, formatBestFit, parse,
   safeParse, conversion, registry helpers.
-- `phone`: create, format, parse, safeParse, input, country metadata, examples.
+- `phone`: create, format, parse, safeParse, input, country metadata, examples,
+  and provider-independent verification state.
 - `input`: state helpers and decimal, money, percent, integer, unit option
   factories.
 - `locales`: resolve, symbols, digit normalization.
@@ -112,7 +113,11 @@ policy when an application wants to round at the boundary.
 
 ```ts
 import { money, percent } from "expo-numerator";
-import { formatMoney, formatNumber, formatPercent } from "expo-numerator/format";
+import {
+  formatMoney,
+  formatNumber,
+  formatPercent,
+} from "expo-numerator/format";
 import { safeParseMoney, safeParseNumber } from "expo-numerator/parse";
 
 formatNumber("1234.56", { locale: "tr-TR" }); // "1.234,56"
@@ -147,7 +152,7 @@ angle, force, torque, density, electric current, and electric potential.
 
 ## Phone
 
-```ts
+```tsx
 import {
   formatPhone,
   getPhoneCountries,
@@ -155,6 +160,15 @@ import {
   getPhoneMetadataInfo,
   parsePhone,
   safeParsePhone,
+  PhoneOtpInput,
+  createPhoneVerificationState,
+  createPhoneVerificationCheckRequest,
+  createPhoneVerificationResendRequest,
+  createPhoneVerificationStartRequest,
+  applyPhoneVerificationStart,
+  setPhoneVerificationCode,
+  canSubmitPhoneVerification,
+  usePhoneVerification,
   type PhoneMetadataProfile,
 } from "expo-numerator/phone";
 
@@ -171,6 +185,46 @@ safeParsePhone("+12015550123").ok; // true
 getPhoneCountries({ preferredRegions: ["TR"], locale: "tr-TR" })[0].region;
 getPhoneExampleNumber("US", { type: "tollFree" }); // "+18002345678"
 getPhoneMetadataInfo("max").profile; // "max"
+
+const verification = createPhoneVerificationState({
+  phone: value,
+  channel: "sms",
+  purpose: "signUp",
+});
+createPhoneVerificationStartRequest(verification).phoneE164; // "+905012345678"
+const sent = applyPhoneVerificationStart(verification, {
+  sessionId: "ver_123",
+});
+const withCode = setPhoneVerificationCode(sent, "123456");
+canSubmitPhoneVerification(withCode); // true
+createPhoneVerificationCheckRequest(withCode).sessionId; // "ver_123"
+createPhoneVerificationResendRequest(sent).phoneE164; // "+905012345678"
+
+function OtpEntry() {
+  const otp = usePhoneVerification({
+    phone: value,
+    channel: "sms",
+    purpose: "signUp",
+  });
+
+  otp.createStartRequest({
+    locale: "tr-TR",
+    idempotencyKey: "start-123",
+    rateLimitKey: "phone:+905012345678",
+  }).phoneE164; // "+905012345678"
+
+  return (
+    <PhoneOtpInput
+      phone={value}
+      channel="sms"
+      purpose="signUp"
+      onComplete={(code, state) => {
+        code; // "123456"
+        state.sessionId; // backend-issued verification session id, when present
+      }}
+    />
+  );
+}
 ```
 
 Phone values use E.164 as the canonical storage format. Calling-code and
@@ -182,6 +236,21 @@ phone region rather than the display locale; locale is used for country picker
 labels. Default validation is mobile-first for sign-up and OTP flows, and
 `validationMode: "possible"` is available for tolerant draft parsing.
 
+Phone verification APIs are provider-independent state and contract helpers.
+They do not send SMS, store OTP secrets, prove reachability, or prove account
+ownership. Real OTP generation, provider credentials, rate limits, fraud
+controls, audit logs, and user binding belong on the application backend.
+`usePhoneVerification` and `PhoneOtpInput` are styles-free React Native
+surfaces for OTP code entry; they normalize pasted digits and expose lifecycle
+state without binding to any delivery provider. OTP policy is bounded toward
+industry-safe client contracts: six digits by default, at most a 10-minute
+validity window, resend delay floor, and failed-attempt counters that do not
+exceed the NIST 100-attempt upper bound. Four-digit OTP is supported only with
+`policy.allowShortCode: true` for low-assurance or provider-compatibility flows;
+avoid short codes for MFA, account recovery, or phone-change ownership checks.
+Request helpers support idempotency keys, rate-limit keys, scoped rate-limit
+fields, and non-secret client context for backend/provider integrations.
+
 ## Input
 
 ```tsx
@@ -191,7 +260,12 @@ import {
   createMoneyInputOptions,
   useNumberInput,
 } from "expo-numerator/input";
-import { PhoneCountryPicker, PhoneInput, usePhoneInput } from "expo-numerator/phone";
+import {
+  PhoneCountryPicker,
+  PhoneInput,
+  PhoneOtpInput,
+  usePhoneInput,
+} from "expo-numerator/phone";
 
 const options = createMoneyInputOptions("TRY", {
   locale: "tr-TR",
@@ -200,6 +274,7 @@ const options = createMoneyInputOptions("TRY", {
 
 <MoneyInput locale="tr-TR" currency="TRY" entryMode="minorUnits" />;
 <PhoneInput defaultRegion="TR" validationMode="mobile" />;
+<PhoneOtpInput phone="+905012345678" channel="sms" purpose="signUp" />;
 ```
 
 Money input entry modes:

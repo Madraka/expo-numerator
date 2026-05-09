@@ -121,6 +121,15 @@ Expo Router native country picker sheet smoke tests:
 - `expo-numerator-phone-input`
 - `expo-numerator-phone-parsed`
 - `expo-numerator-phone-state`
+- `expo-numerator-phone-otp-input`
+- `expo-numerator-phone-otp-start`
+- `expo-numerator-phone-otp-submit`
+- `expo-numerator-phone-otp-resend`
+- `expo-numerator-phone-otp-state`
+- `expo-numerator-phone-otp-request`
+- `expo-numerator-phone-otp-check-request`
+- `expo-numerator-phone-otp-resend-request`
+- `expo-numerator-phone-otp-provider-contract`
 - `expo-numerator-phone-profile-switch`
 - `expo-numerator-phone-profile-max`
 - `expo-numerator-phone-asyoutype`
@@ -209,6 +218,16 @@ Run the example app on iOS and Android and verify:
   editable.
 - Integer-constrained mode strips decimal separators and minus signs when
   `allowDecimal={false}` and `allowNegative={false}`.
+- The Phone page OTP demo keeps the client contract limited to start, check,
+  and resend payloads with E.164 destination, channel, purpose, locale,
+  metadata profile, session id, idempotency key, rate-limit scope, masked
+  destination, expiry, and counters.
+- OTP entry defaults to six or more digits. Four-digit entry is available only
+  through explicit `allowShortCode` policy opt-in for low-assurance or provider
+  compatibility flows.
+- OTP secrets, delivery provider credentials, fraud/rate limits, and user
+  ownership binding stay outside the client package and must be verified on the
+  application backend.
 
 The pure Jest matrix covers the same scenarios through
 `applyNumberInputEdit`, `applyNumberInputText`, and

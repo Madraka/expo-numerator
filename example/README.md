@@ -3,8 +3,8 @@
 This Expo SDK 55 app is the runnable showcase and manual test center for
 `expo-numerator`. It demonstrates the public package APIs through Expo Router
 pages for exact values, money, units, locale data, formatting, parsing, typed
-errors, React Native input behavior, Expo integration, package exports, and
-release hardening.
+errors, phone input/OTP contracts, React Native input behavior, Expo
+integration, package exports, and release hardening.
 
 ## Setup
 
@@ -62,6 +62,8 @@ showcase page.
 - `/parse`: strict, loose, and safe parsing behavior.
 - `/errors`: typed `NumeratorError` failures and safe result boundaries.
 - `/input`: React Native input state, caret, paste, and entry-mode scenarios.
+- `/phone`: E.164 phone input, country picker sheet, as-you-type formatting,
+  and OTP verification contract demo.
 - `/expo`: provider, hook, optional localization, and native fallback behavior.
 - `/package`: public exports, source conditions, and package smoke coverage.
 - `/hardening`: release and verification gates.
