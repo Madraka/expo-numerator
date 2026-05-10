@@ -1,4 +1,5 @@
 import { getUnitMeta } from "./unitRegistry";
+import { getUnitValueMeta } from "./unitValueIntegrity";
 import { normalizeDecimal } from "../core/decimal/normalizeDecimal";
 import { NumeratorError } from "../core/errors/NumeratorError";
 import type { UnitValue } from "../core/value/types";
@@ -26,7 +27,7 @@ export function convertUnit(
   targetUnit: string,
   options: UnitConversionOptions = {},
 ): UnitValue {
-  const sourceMeta = getUnitMeta(value.unit);
+  const sourceMeta = getUnitValueMeta(value);
   const targetMeta = getUnitMeta(targetUnit);
 
   if (sourceMeta.dimension !== targetMeta.dimension) {

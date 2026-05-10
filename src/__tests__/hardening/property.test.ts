@@ -55,6 +55,28 @@ describe("deterministic property checks", () => {
     }
   });
 
+  it("keeps scientific and engineering coefficients normalized after rounding", () => {
+    for (const sample of generateDecimalSamples(160)) {
+      for (const maximumFractionDigits of [0, 1, 4]) {
+        const scientific = formatNumber(sample, {
+          maximumFractionDigits,
+          notation: "scientific",
+          roundingMode: "halfExpand",
+          useGrouping: false,
+        });
+        const engineering = formatNumber(sample, {
+          maximumFractionDigits,
+          notation: "engineering",
+          roundingMode: "halfExpand",
+          useGrouping: false,
+        });
+
+        expectScientificParts(scientific, 1);
+        expectScientificParts(engineering, 3);
+      }
+    }
+  });
+
   it("keeps addition and subtraction inverse relationships", () => {
     const samples = generateDecimalSamples(120);
 
@@ -112,4 +134,28 @@ function createRandom(seed: number): () => number {
     state = (state * 1664525 + 1013904223) >>> 0;
     return state / 0x100000000;
   };
+}
+
+function expectScientificParts(formatted: string, exponentStep: 1 | 3): void {
+  const [coefficient, exponentText] = formatted.split("E");
+
+  expect(exponentText).toBeDefined();
+
+  const exponent = Number(exponentText);
+  const magnitude = coefficient.startsWith("-")
+    ? coefficient.slice(1)
+    : coefficient;
+  const [integer] = magnitude.split(".");
+
+  if (magnitude === "0") {
+    expect(exponent).toBe(0);
+    return;
+  }
+
+  expect(integer.length).toBeGreaterThanOrEqual(1);
+  expect(integer.length).toBeLessThanOrEqual(exponentStep);
+
+  if (exponentStep === 3) {
+    expect(exponent % 3).toBe(0);
+  }
 }

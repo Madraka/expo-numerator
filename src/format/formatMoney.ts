@@ -12,8 +12,8 @@ export function formatMoney(
   const display = options.currencyDisplay ?? "symbol";
   const formatted = formatDecimalString(value.amount, {
     ...options,
-    minimumFractionDigits: options.minimumFractionDigits ?? value.scale,
-    maximumFractionDigits: options.maximumFractionDigits ?? value.scale,
+    minimumFractionDigits: options.minimumFractionDigits ?? meta.minorUnit,
+    maximumFractionDigits: options.maximumFractionDigits ?? meta.minorUnit,
     signDisplay: "never",
   });
   const currency = getCurrencyDisplay(meta, display);

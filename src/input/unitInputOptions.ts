@@ -39,8 +39,10 @@ export function createUnitInputOptions(
 
   return {
     ...options,
+    allowDecimal: options.allowDecimal ?? maximumFractionDigits > 0,
     maximumFractionDigits,
     mode: "unit",
+    trailingZeroDisplay: options.trailingZeroDisplay ?? "stripIfInteger",
     unit: meta.code,
   };
 }

@@ -7,12 +7,16 @@ import {
   createMoneyInputOptions,
   createNumberInputState,
   createPercentInputOptions,
+  createUnitInputOptions,
   focusNumberInputState,
   formatNumberInputOnBlur,
+  money,
+  percent,
   resetNumberInputState,
   sanitizeNumberInputText,
   setNumberInputSelection,
   toggleNumberInputSign,
+  unit,
 } from "../../index";
 import type { NumericValue } from "../../index";
 
@@ -208,6 +212,41 @@ describe("number input state engine", () => {
     expect(state.text).toBe("26,48");
     expectMoneyValue(state.value, "26.48", "TRY");
     expect(state.selection).toEqual({ start: 5, end: 5 });
+  });
+
+  it("keeps minor-unit money entry on registry scale when display digits are overridden", () => {
+    const options = createMoneyInputOptions("USD", {
+      entryMode: "minorUnits",
+      maximumFractionDigits: 0,
+      locale: "en-US",
+    });
+    const state = applyNumberInputNativeTextChange(
+      createNumberInputState(options),
+      "2648",
+      options,
+    );
+
+    expect(state.text).toBe("26.48");
+    expectMoneyValue(state.value, "26.48", "USD");
+    expect(state.selection).toEqual({ start: 5, end: 5 });
+  });
+
+  it("keeps invalid unit configuration inside input state instead of throwing", () => {
+    const options = {
+      mode: "unit" as const,
+      unit: "unknown-unit",
+    };
+    const state = applyNumberInputText(
+      createNumberInputState(options),
+      "12",
+      undefined,
+      options,
+    );
+
+    expect(state.text).toBe("12");
+    expect(state.value).toBeNull();
+    expect(state.isValid).toBe(false);
+    expect(state.error?.code).toBe("INVALID_UNIT");
   });
 
   it("supports integer-major money entry with blur-time fraction display", () => {
@@ -408,6 +447,90 @@ describe("number input state engine", () => {
       unit: "kilometer",
       value: "8.75",
     });
+  });
+
+  it("keeps unit input display from looking like fixed-scale money", () => {
+    const state = createNumberInputState(
+      createUnitInputOptions("m²", {
+        defaultValue: "1500",
+        locale: "tr-TR",
+      }),
+    );
+
+    expect(state.text).toBe("1500");
+    expect(state.value).toEqual({
+      dimension: "area",
+      kind: "unit",
+      unit: "square-meter",
+      value: "1500",
+    });
+  });
+
+  it("rejects external typed values that do not match explicit input identity", () => {
+    const moneyState = createNumberInputState(
+      createMoneyInputOptions("TRY", {
+        defaultValue: money("1", "USD"),
+        locale: "tr-TR",
+      }),
+    );
+    const unitState = createNumberInputState(
+      createUnitInputOptions("meter", {
+        defaultValue: unit("1", "kilometer"),
+      }),
+    );
+    const percentAsDecimalState = createNumberInputState({
+      defaultValue: percent("0.125"),
+      mode: "decimal",
+    });
+
+    expect(moneyState.text).toBe("1,00");
+    expect(moneyState.value).toBeNull();
+    expect(moneyState.isValid).toBe(false);
+    expect(moneyState.error?.code).toBe("INVALID_CURRENCY");
+
+    expect(unitState.text).toBe("1");
+    expect(unitState.value).toBeNull();
+    expect(unitState.isValid).toBe(false);
+    expect(unitState.error?.code).toBe("INVALID_UNIT");
+
+    expect(percentAsDecimalState.text).toBe("12.5");
+    expect(percentAsDecimalState.value).toBeNull();
+    expect(percentAsDecimalState.isValid).toBe(false);
+    expect(percentAsDecimalState.error?.code).toBe("VALUE_OUT_OF_RANGE");
+  });
+
+  it("revalidates committed typed values when reset uses a new input identity", () => {
+    const committedMoneyState = createNumberInputState(
+      createMoneyInputOptions("USD", {
+        defaultValue: money("1", "USD"),
+        locale: "tr-TR",
+      }),
+    );
+    const resetMoneyState = resetNumberInputState(
+      committedMoneyState,
+      createMoneyInputOptions("TRY", {
+        locale: "tr-TR",
+      }),
+    );
+    const committedUnitState = createNumberInputState(
+      createUnitInputOptions("kilometer", {
+        defaultValue: unit("1", "kilometer"),
+      }),
+    );
+    const resetUnitState = resetNumberInputState(
+      committedUnitState,
+      createUnitInputOptions("meter"),
+    );
+
+    expect(resetMoneyState.text).toBe("1,00");
+    expect(resetMoneyState.value).toBeNull();
+    expect(resetMoneyState.isValid).toBe(false);
+    expect(resetMoneyState.error?.code).toBe("INVALID_CURRENCY");
+
+    expect(resetUnitState.text).toBe("1");
+    expect(resetUnitState.value).toBeNull();
+    expect(resetUnitState.isValid).toBe(false);
+    expect(resetUnitState.error?.code).toBe("INVALID_UNIT");
   });
 
   it("uses semantic percent values for default controlled text", () => {

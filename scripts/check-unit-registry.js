@@ -146,6 +146,19 @@ function checkRuntimeSmokes(numerator) {
           unitSystem: "us",
         }).unit === "mile",
     ],
+    [
+      "unit value dimension guard",
+      () =>
+        !numerator.safeUnit("1", "unknown-unit").ok &&
+        throwsInvalidUnit(() =>
+          numerator.formatUnit({
+            dimension: "mass",
+            kind: "unit",
+            unit: "kilometer",
+            value: "1",
+          }),
+        ),
+    ],
   ];
 
   for (const [label, assertion] of expectations) {
@@ -159,6 +172,15 @@ function checkRuntimeSmokes(numerator) {
   }
 
   return failures;
+}
+
+function throwsInvalidUnit(operation) {
+  try {
+    operation();
+    return false;
+  } catch (error) {
+    return error?.code === "INVALID_UNIT";
+  }
 }
 
 function getRegisteredDimensions(numerator) {

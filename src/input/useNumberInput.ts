@@ -32,7 +32,24 @@ export function useNumberInput(
     if (isControlled) {
       setState(createNumberInputState(options));
     }
-  }, [isControlled, options.value]);
+  }, [
+    isControlled,
+    options.allowDecimal,
+    options.allowNegative,
+    options.currency,
+    options.entryStrategy,
+    options.locale,
+    options.maximumFractionDigits,
+    options.minimumFractionDigits,
+    options.mode,
+    options.parseMode,
+    options.roundingMode,
+    options.signDisplay,
+    options.trailingZeroDisplay,
+    options.unit,
+    options.useGrouping,
+    options.value,
+  ]);
 
   const setText = useCallback(
     (text: string, selection?: TextSelection) => {

@@ -121,12 +121,19 @@ import {
 import { safeParseMoney, safeParseNumber } from "expo-numerator/parse";
 
 formatNumber("1234.56", { locale: "tr-TR" }); // "1.234,56"
+formatNumber("999.95", {
+  maximumFractionDigits: 1,
+  notation: "scientific",
+}); // "1.0E3"
 formatMoney(money("1234.56", "TRY"), { locale: "tr-TR" });
 formatPercent(percent("0.125"), { locale: "tr-TR" });
 
 safeParseNumber("1.234,56", { locale: "tr-TR" }).ok; // true
 safeParseMoney("₺1.234,56", { locale: "tr-TR", currency: "TRY" }).ok; // true
 ```
+
+Scientific and engineering notation normalize the exponent after coefficient
+rounding, so rounded mantissas never leak as `10E2` or `1000E3`.
 
 Strict parse mode validates locale grouping, separators, signs, currency, and
 affixes. Loose mode is for copy-paste tolerance.
@@ -149,6 +156,9 @@ convertUnitForLocale(unit("1", "bar"), { locale: "en-US", scale: 4 }).unit;
 The built-in unit registry covers length, area, volume, mass, speed,
 acceleration, temperature, time, data, frequency, energy, power, pressure,
 angle, force, torque, density, electric current, and electric potential.
+Unit values keep canonical decimal text plus a canonical unit code. Formatting,
+conversion, locale preference, and best-fit helpers validate that the value's
+dimension still matches the registered unit before using it.
 
 ## Phone
 

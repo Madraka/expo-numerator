@@ -20,6 +20,7 @@ import {
   parseUnit,
   safeParseUnit,
   safeUnit,
+  sanitizeNumberInputText,
   unit,
 } from "../../index";
 
@@ -198,6 +199,25 @@ describe("unit registry and measurement domain", () => {
     expect(() => convertUnit(unit("1", "kilometer"), "kilogram")).toThrow(
       "INVALID_UNIT",
     );
+  });
+
+  it("rejects unit values whose dimension does not match the registry", () => {
+    const mismatchedUnit = {
+      dimension: "mass",
+      kind: "unit",
+      unit: "kilometer",
+      value: "1",
+    } as const;
+
+    expect(() => formatUnit(mismatchedUnit)).toThrow("INVALID_UNIT");
+    expect(() => convertUnit(mismatchedUnit, "meter")).toThrow("INVALID_UNIT");
+    expect(() =>
+      getPreferredUnitForValue(mismatchedUnit, { locale: "en-US" }),
+    ).toThrow("INVALID_UNIT");
+    expect(() =>
+      convertUnitForLocale(mismatchedUnit, { locale: "en-US" }),
+    ).toThrow("INVALID_UNIT");
+    expect(() => convertUnitToBestFit(mismatchedUnit)).toThrow("INVALID_UNIT");
   });
 
   it("resolves locale-aware preferred unit systems and target units", () => {
@@ -385,10 +405,25 @@ describe("unit registry and measurement domain", () => {
     );
     expect(createUnitInputOptions("kilowatt-hour")).toEqual(
       expect.objectContaining({
+        allowDecimal: true,
         maximumFractionDigits: 2,
         mode: "unit",
+        trailingZeroDisplay: "stripIfInteger",
         unit: "kilowatt-hour",
       }),
     );
+
+    const byteOptions = createUnitInputOptions("byte");
+
+    expect(byteOptions).toEqual(
+      expect.objectContaining({
+        allowDecimal: false,
+        maximumFractionDigits: 0,
+        mode: "unit",
+        trailingZeroDisplay: "stripIfInteger",
+        unit: "byte",
+      }),
+    );
+    expect(sanitizeNumberInputText("1.5", byteOptions)).toBe("15");
   });
 });

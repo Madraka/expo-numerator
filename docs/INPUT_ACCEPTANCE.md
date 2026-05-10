@@ -23,6 +23,12 @@ pure acceptance matrix verifies.
   kind while keeping the editable text numeric and caret-stable.
 - `defaultValue` seeds uncontrolled input state, `value` enables controlled
   state synchronization, and legacy `initialValue` remains supported.
+  Controlled synchronization revalidates when the field identity changes, so a
+  stable `value` cannot remain valid after switching `currency`, `unit`, or
+  `mode`.
+- Typed external values must match explicit input identity. For example, a
+  `MoneyValue` for `USD` is not silently reinterpreted as `TRY`, and a
+  `UnitValue` for `kilometer` is not silently reinterpreted as `meter`.
 - `focus`, `blur`, `commit`, and `reset` expose lifecycle state through
   `isFocused`, `isDirty`, and `committedValue` without forcing consumers into a
   package-owned form abstraction.
@@ -179,12 +185,20 @@ Run the example app on iOS and Android and verify:
   prevents the caret from moving back into the final group.
 - `entryMode="minorUnits"` treats digits as minor units: `2648` emits `26.48`
   for a two-minor currency and displays `26,48` in `tr-TR`.
+- `entryMode="minorUnits"` always uses the currency registry minor-unit scale
+  for the entered digits. `maximumFractionDigits` is a formatting constraint for
+  other money modes, not a way to redefine cents, fils, or zero-minor currency
+  storage. Register a custom currency when an app needs a different scale.
 - `entryMode="integerMajor"` treats digits as major units: `2648` emits `2648`
   and displays `2.648,00` after blur for TRY-style two-minor currencies.
 - Select an integer/fraction range and replace it; the caret collapses at the
   replacement boundary.
 - Blur the field with `maximumFractionDigits={2}`; formatting remains stable.
 - Money mode with `currency="TRY"` emits `{ kind: "money", amount, currency }`.
+- Controlled money, unit, and mode inputs must update their profile when the
+  semantic identity changes. Keeping the same typed `value` while switching the
+  field from `USD` to `TRY`, `kilometer` to `meter`, or `percent` to `decimal`
+  produces an invalid input state instead of silently reusing the old value.
 - Money input profiles can be generated with
   `createMoneyInputOptions(currencyCode)` so apps reuse registry-backed
   fraction defaults, zero-minor decimal constraints, and blur formatting.
@@ -204,6 +218,12 @@ Run the example app on iOS and Android and verify:
   into editable text.
 - Unit input profiles can be generated with `createUnitInputOptions(unitCode)`
   so apps reuse registry-backed fraction defaults and canonical unit codes.
+- Unit input profiles treat `maximumFractionDigits` as a precision cap, not as a
+  fixed-width display policy. Whole unit values such as `1500 m²` stay `1500`
+  instead of becoming money-like `1500,00`.
+- Unit profiles whose registry-backed fraction default is `0`, such as `byte`,
+  disable decimal entry by default. Fractional measurement profiles keep decimal
+  entry enabled unless the caller explicitly overrides `allowDecimal`.
 - `UnitInput` applies the same canonical unit profile directly for common
   measurement fields.
 - Locale display preferences remain separate from editable text. Convert stored

@@ -18,6 +18,7 @@ import { getLocaleSymbols } from "../locale/resolveLocale";
 import { getCurrencyMeta } from "../money/currencyRegistry";
 import { money } from "../money/money";
 import { parseNumber } from "../parse/parseNumber";
+import { normalizeUnitCode } from "../unit/unitRegistry";
 
 const DEFAULT_SELECTION: TextSelection = Object.freeze({ start: 0, end: 0 });
 const INPUT_SPACE_PATTERN = /[\s\u00a0\u202f]/g;
@@ -31,11 +32,9 @@ export function createNumberInputState(
     return markCommitted(createState("", DEFAULT_SELECTION, options));
   }
 
-  const text = formatEditableTextFromExternalValue(externalValue, options);
+  const state = createStateFromExternalValue(externalValue, options);
 
-  return markCommitted(
-    createState(text, getCollapsedSelection(text.length), options),
-  );
+  return markCommitted(state);
 }
 
 export function applyNumberInputText(
@@ -206,9 +205,34 @@ export function resetNumberInputState(
     );
   }
 
-  const text = formatEditableTextFromExternalValue(resetValue, options);
   return markCommitted(
-    createState(text, getCollapsedSelection(text.length), options, state),
+    createStateFromExternalValue(resetValue, options, state),
+  );
+}
+
+function createStateFromExternalValue(
+  value: NumberInputExternalValue,
+  options: NumberInputOptions,
+  previous?: NumberInputState,
+): NumberInputState {
+  const text = formatEditableTextFromExternalValue(value, options);
+  const error = getExternalValueCompatibilityError(value, options);
+
+  if (error !== null) {
+    return createInvalidState(
+      text,
+      getCollapsedSelection(text.length),
+      options,
+      error,
+      previous,
+    );
+  }
+
+  return createState(
+    text,
+    getCollapsedSelection(text.length),
+    options,
+    previous,
   );
 }
 
@@ -278,16 +302,34 @@ function getDigitEntryDisplayText(
 
   return formatNumber(parseText, {
     ...getModeFormatOptions(options),
-    maximumFractionDigits:
-      options.entryStrategy === "integerMajor"
-        ? 0
-        : options.maximumFractionDigits,
-    minimumFractionDigits:
-      options.entryStrategy === "integerMajor"
-        ? 0
-        : options.minimumFractionDigits,
+    ...getDigitEntryFormatDigits(options),
     useGrouping: options.useGrouping,
   });
+}
+
+function getDigitEntryFormatDigits(
+  options: NumberInputOptions,
+): Pick<NumberInputOptions, "maximumFractionDigits" | "minimumFractionDigits"> {
+  if (options.entryStrategy === "integerMajor") {
+    return {
+      maximumFractionDigits: 0,
+      minimumFractionDigits: 0,
+    };
+  }
+
+  if (options.entryStrategy === "minorUnits") {
+    const scale = getInputFractionScale(options);
+
+    return {
+      maximumFractionDigits: scale,
+      minimumFractionDigits: scale,
+    };
+  }
+
+  return {
+    maximumFractionDigits: options.maximumFractionDigits,
+    minimumFractionDigits: options.minimumFractionDigits,
+  };
 }
 
 function createMinorUnitDecimal(digits: string, scale: number): string {
@@ -303,6 +345,17 @@ function createMinorUnitDecimal(digits: string, scale: number): string {
 }
 
 function getInputFractionScale(options: NumberInputOptions): number {
+  if (
+    options.entryStrategy === "minorUnits" &&
+    options.currency !== undefined
+  ) {
+    try {
+      return getCurrencyMeta(options.currency).minorUnit;
+    } catch {
+      return 2;
+    }
+  }
+
   if (options.maximumFractionDigits !== undefined) {
     return Math.max(0, Math.trunc(options.maximumFractionDigits));
   }
@@ -502,6 +555,28 @@ function createState(
   }
 }
 
+function createInvalidState(
+  text: string,
+  selection: TextSelection,
+  options: NumberInputOptions,
+  error: NumeratorError,
+  previous?: NumberInputState,
+): NumberInputState {
+  const committedValue = previous?.committedValue ?? null;
+  const isFocused = previous?.isFocused ?? false;
+
+  return {
+    text,
+    value: null,
+    committedValue,
+    selection: clampSelection(selection, text),
+    isValid: false,
+    isDirty: !numericValuesEqual(null, committedValue),
+    isFocused,
+    error,
+  };
+}
+
 function markCommitted(state: NumberInputState): NumberInputState {
   return {
     ...state,
@@ -651,6 +726,64 @@ function getValueDecimalInput(value: NumericValue): DecimalInput {
   }
 
   return value;
+}
+
+function getExternalValueCompatibilityError(
+  value: NumberInputExternalValue,
+  options: NumberInputOptions,
+): NumeratorError | null {
+  if (typeof value !== "object" || value === null || !("kind" in value)) {
+    return null;
+  }
+
+  if (options.mode !== undefined && value.kind !== options.mode) {
+    return new NumeratorError("VALUE_OUT_OF_RANGE", {
+      expectedMode: options.mode,
+      reason: "External value kind does not match the input mode.",
+      receivedKind: value.kind,
+    });
+  }
+
+  if (value.kind === "money" && options.currency !== undefined) {
+    try {
+      const expectedCurrency = getCurrencyMeta(options.currency).code;
+      const receivedCurrency = getCurrencyMeta(value.currency).code;
+
+      if (expectedCurrency !== receivedCurrency) {
+        return new NumeratorError("INVALID_CURRENCY", {
+          currency: expectedCurrency,
+          detectedCurrency: receivedCurrency,
+        });
+      }
+    } catch (error) {
+      return error instanceof NumeratorError
+        ? error
+        : new NumeratorError("INVALID_CURRENCY", {
+            currency: options.currency,
+          });
+    }
+  }
+
+  if (value.kind === "unit" && options.unit !== undefined) {
+    const expectedUnit = normalizeUnitCode(options.unit);
+    const receivedUnit = normalizeUnitCode(value.unit);
+
+    if (expectedUnit === null || receivedUnit === null) {
+      return new NumeratorError("INVALID_UNIT", {
+        expected: options.unit,
+        received: value.unit,
+      });
+    }
+
+    if (expectedUnit !== receivedUnit) {
+      return new NumeratorError("INVALID_UNIT", {
+        expected: expectedUnit,
+        received: receivedUnit,
+      });
+    }
+  }
+
+  return null;
 }
 
 function createModeValue(

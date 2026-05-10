@@ -8,7 +8,34 @@
 
 ### 🐛 Bug fixes
 
+- Kept `minorUnits` money entry tied to the currency registry minor-unit scale
+  even when display fraction options are overridden.
+- Prevented unit input profiles from rendering whole measurement values as
+  money-like fixed-decimal text, so area examples such as `1500 m²` stay `1500`
+  instead of `1500,00`.
+- Disabled decimal entry by default for unit profiles whose registry-backed
+  fraction default is `0`, such as `byte`.
+- Made money formatting use the currency registry minor unit by default instead
+  of trusting a caller-supplied `MoneyValue.scale` field.
+- Added a unit value integrity guard so formatting, conversion, locale
+  preference, and best-fit helpers reject values whose `dimension` does not
+  match the registered unit code.
+- Kept invalid unit input configuration inside `NumberInputState` as a typed
+  invalid state instead of allowing the error to escape the input boundary.
+- Prevented typed external input values from being silently reinterpreted across
+  explicit money currency, unit code, or mode boundaries.
+- Revalidated controlled input state when semantic identity options change, so
+  a stable `value` cannot leak across updated `currency`, `unit`, or `mode`
+  props.
+- Renormalized scientific and engineering notation after coefficient rounding,
+  preventing outputs such as `10.0E2` or `1000E3`.
+
 ### 💡 Others
+
+- Expanded input replay, value-format smoke, unit registry smoke, focused Jest
+  and deterministic property coverage, plus public docs for money/unit input
+  display policy, controlled input identity changes, scientific notation
+  rollover, and unit value boundary hardening.
 
 ## 0.1.2 - 2026-05-10
 

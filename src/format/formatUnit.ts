@@ -11,7 +11,8 @@ import {
   convertUnitForLocale,
   type UnitLocaleConversionOptions,
 } from "../unit/unitPreferences";
-import { getUnitLabels, getUnitMeta } from "../unit/unitRegistry";
+import { getUnitLabels } from "../unit/unitRegistry";
+import { getUnitValueMeta } from "../unit/unitValueIntegrity";
 
 export type UnitFormatOptions = NumberFormatOptions & {
   unitDisplay?: UnitDisplay;
@@ -52,7 +53,7 @@ function getUnitDisplayLabel(
   display: UnitDisplay,
   locale?: string,
 ): string {
-  const meta = getUnitMeta(value.unit);
+  const meta = getUnitValueMeta(value);
 
   if (display === "code") {
     return meta.code;

@@ -97,6 +97,32 @@ describe("formatNumber", () => {
     ).toBe("123E-6");
   });
 
+  it("renormalizes scientific and engineering notation after coefficient rounding", () => {
+    expect(
+      formatNumber(decimal("999.95"), {
+        locale: "en-US",
+        maximumFractionDigits: 1,
+        notation: "scientific",
+      }),
+    ).toBe("1.0E3");
+
+    expect(
+      formatNumber(decimal("-999.95"), {
+        locale: "en-US",
+        maximumFractionDigits: 1,
+        notation: "scientific",
+      }),
+    ).toBe("-1.0E3");
+
+    expect(
+      formatNumber(decimal("999500"), {
+        locale: "en-US",
+        maximumFractionDigits: 0,
+        notation: "engineering",
+      }),
+    ).toBe("1E6");
+  });
+
   it("formats compact notation from generated CLDR-lite patterns", () => {
     expect(
       formatNumber(decimal("1234"), {
@@ -175,6 +201,22 @@ describe("formatNumber", () => {
     ]);
   });
 
+  it("formats renormalized scientific rollover output to parts", () => {
+    expect(
+      formatNumberToParts(decimal("999.95"), {
+        locale: "en-US",
+        maximumFractionDigits: 1,
+        notation: "scientific",
+      }),
+    ).toEqual([
+      { type: "integer", value: "1" },
+      { type: "decimal", value: "." },
+      { type: "fraction", value: "0" },
+      { type: "exponentSeparator", value: "E" },
+      { type: "exponentInteger", value: "3" },
+    ]);
+  });
+
   it("formats compact output to parts", () => {
     expect(
       formatNumberToParts(decimal("1234"), {
@@ -201,6 +243,21 @@ describe("formatMoney", () => {
     expect(formatMoney(money("1234.56", "JPY"), { locale: "ja-JP" })).toBe(
       "¥1,235",
     );
+  });
+
+  it("uses registry minor units instead of trusting a money value scale field", () => {
+    expect(
+      formatMoney(
+        {
+          amount: "1234.56",
+          currency: "JPY",
+          kind: "money",
+          minor: undefined,
+          scale: 2,
+        },
+        { locale: "ja-JP" },
+      ),
+    ).toBe("¥1,235");
   });
 
   it.each([

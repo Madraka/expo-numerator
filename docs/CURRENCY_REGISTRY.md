@@ -20,6 +20,9 @@ formatting, parsing, and input profiles.
   minor unit.
 - `minor` is emitted only when the decimal amount fits the currency minor unit
   exactly. The library does not round money during construction.
+- Money formatting uses the registry minor unit for the currency by default.
+  It does not trust a caller-supplied `MoneyValue.scale` field as a display
+  policy source.
 - `registerCurrency` remains available for app-owned ledger units, crypto assets,
   or provider-specific policy overrides.
 - Exchange rates, tender timelines, settlement exceptions, and payment-provider

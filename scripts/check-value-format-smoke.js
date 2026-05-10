@@ -115,6 +115,22 @@ function checkFormatMatrix(numerator) {
         }) === "12.346E3",
     ],
     [
+      "scientific rounding rollover",
+      () =>
+        numerator.formatNumber("999.95", {
+          maximumFractionDigits: 1,
+          notation: "scientific",
+        }) === "1.0E3",
+    ],
+    [
+      "engineering rounding rollover",
+      () =>
+        numerator.formatNumber("999500", {
+          maximumFractionDigits: 0,
+          notation: "engineering",
+        }) === "1E6",
+    ],
+    [
       "accounting money",
       () =>
         numerator.formatMoney(numerator.money("-1234.56", "USD"), {
@@ -135,6 +151,20 @@ function checkFormatMatrix(numerator) {
         numerator.formatMoney(numerator.money("1234", "JPY"), {
           locale: "ja-JP",
         }) === "¥1,234",
+    ],
+    [
+      "money format registry scale",
+      () =>
+        numerator.formatMoney(
+          {
+            amount: "1234.56",
+            currency: "JPY",
+            kind: "money",
+            minor: undefined,
+            scale: 2,
+          },
+          { locale: "ja-JP" },
+        ) === "¥1,235",
     ],
     [
       "percent affix",
@@ -165,6 +195,19 @@ function checkFormatMatrix(numerator) {
         numerator
           .formatNumberToParts("1234", { locale: "en-US", notation: "compact" })
           .some((part) => part.type === "compact" && part.value === "K"),
+    ],
+    [
+      "parts scientific rollover",
+      () =>
+        numerator
+          .formatNumberToParts("999.95", {
+            locale: "en-US",
+            maximumFractionDigits: 1,
+            notation: "scientific",
+          })
+          .map((part) => `${part.type}:${part.value}`)
+          .join("|") ===
+        "integer:1|decimal:.|fraction:0|exponentSeparator:E|exponentInteger:3",
     ],
   ];
 

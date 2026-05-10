@@ -1,6 +1,7 @@
 import { convertUnit, type UnitConversionOptions } from "./convertUnit";
 import type { UnitDimension } from "./unitMeta";
 import { getUnitMeta } from "./unitRegistry";
+import { getUnitValueMeta } from "./unitValueIntegrity";
 import { NumeratorError } from "../core/errors/NumeratorError";
 import type { UnitValue } from "../core/value/types";
 
@@ -122,7 +123,10 @@ export function getPreferredUnitForValue(
   value: UnitValue,
   options: UnitPreferenceOptions = {},
 ): string {
-  return getPreferredUnitForDimension(value.dimension, options);
+  return getPreferredUnitForDimension(
+    getUnitValueMeta(value).dimension,
+    options,
+  );
 }
 
 export function convertUnitForLocale(
@@ -130,7 +134,7 @@ export function convertUnitForLocale(
   options: UnitLocaleConversionOptions = {},
 ): UnitValue {
   const targetUnit = getPreferredUnitForValue(value, options);
-  const sourceMeta = getUnitMeta(value.unit);
+  const sourceMeta = getUnitValueMeta(value);
   const targetMeta = getUnitMeta(targetUnit);
 
   if (sourceMeta.code === targetMeta.code) {

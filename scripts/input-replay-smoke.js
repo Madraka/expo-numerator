@@ -112,6 +112,26 @@ const scenarios = [
     },
   },
   {
+    name: "money minor-unit entry keeps registry scale",
+    profile: {
+      type: "money",
+      currency: "USD",
+      options: {
+        entryMode: "minorUnits",
+        locale: "en-US",
+        maximumFractionDigits: 0,
+      },
+    },
+    steps: [{ type: "nativeTextChange", text: "2648" }],
+    expected: {
+      text: "26.48",
+      value: "26.48",
+      selection: { start: 5, end: 5 },
+      isValid: true,
+      errorCode: null,
+    },
+  },
+  {
     name: "percent profile keeps semantic ratio",
     profile: {
       type: "percent",
@@ -150,9 +170,25 @@ const scenarios = [
     },
     steps: [],
     expected: {
-      text: "1500,00",
-      value: "1500.00",
-      selection: { start: 7, end: 7 },
+      text: "1500",
+      value: "1500",
+      selection: { start: 4, end: 4 },
+      isValid: true,
+      errorCode: null,
+    },
+  },
+  {
+    name: "unit profile strips decimals for integer data units",
+    profile: {
+      type: "unit",
+      unit: "byte",
+      options: { locale: "en-US" },
+    },
+    steps: [{ type: "nativeTextChange", text: "1.5" }],
+    expected: {
+      text: "15",
+      value: "15",
+      selection: { start: 2, end: 2 },
       isValid: true,
       errorCode: null,
     },

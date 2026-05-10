@@ -113,6 +113,8 @@ n.unit.convertForLocale(n.unit.create("1", "bar"), {
 ```
 
 Use canonical units for storage and convert only at display or input boundaries.
+Do not edit the `dimension` field manually; unit helpers validate it against the
+registered unit code before formatting or converting values.
 
 ## Phone Input and Storage
 

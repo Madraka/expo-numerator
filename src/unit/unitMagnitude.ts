@@ -6,6 +6,7 @@ import {
   type UnitPreferenceOptions,
 } from "./unitPreferences";
 import { getUnitMeta } from "./unitRegistry";
+import { getUnitValueMeta } from "./unitValueIntegrity";
 import { compareDecimal } from "../core/decimal/compareDecimal";
 import { NumeratorError } from "../core/errors/NumeratorError";
 import type { UnitValue } from "../core/value/types";
@@ -112,9 +113,10 @@ export function convertUnitToBestFit(
   value: UnitValue,
   options: UnitBestFitOptions = {},
 ): UnitValue {
-  const sourceMeta = getUnitMeta(value.unit);
+  const sourceMeta = getUnitValueMeta(value);
   const candidates =
-    options.candidates ?? getUnitBestFitCandidates(value.dimension, options);
+    options.candidates ??
+    getUnitBestFitCandidates(sourceMeta.dimension, options);
 
   if (candidates.length === 0) {
     return convertUnit(
