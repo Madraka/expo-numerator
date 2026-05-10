@@ -27,6 +27,7 @@ export function parseUnit(
 
   if (matched === null) {
     if (expectedCode) {
+      assertUnitDimension(expectedCode, options);
       return unit(parseNumber(trimmed, options), expectedCode);
     }
 
@@ -40,17 +41,28 @@ export function parseUnit(
     });
   }
 
-  const meta = getUnitMeta(matched.code);
+  assertUnitDimension(matched.code, options);
 
-  if (options.dimension && meta.dimension !== options.dimension) {
+  return unit(parseNumber(matched.numberText, options), matched.code);
+}
+
+function assertUnitDimension(
+  unitCode: string,
+  options: UnitParseOptions,
+): void {
+  if (!options.dimension) {
+    return;
+  }
+
+  const meta = getUnitMeta(unitCode);
+
+  if (meta.dimension !== options.dimension) {
     throw new NumeratorError("INVALID_UNIT", {
       dimension: options.dimension,
       received: meta.dimension,
-      unit: matched.code,
+      unit: unitCode,
     });
   }
-
-  return unit(parseNumber(matched.numberText, options), matched.code);
 }
 
 function findUnitSuffix(

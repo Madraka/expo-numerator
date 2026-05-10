@@ -136,7 +136,9 @@ Scientific and engineering notation normalize the exponent after coefficient
 rounding, so rounded mantissas never leak as `10E2` or `1000E3`.
 
 Strict parse mode validates locale grouping, separators, signs, currency, and
-affixes. Loose mode is for copy-paste tolerance.
+affixes. Percent parsing accepts locale affixes or a single boundary percent
+marker, but rejects misplaced or duplicate percent signs such as `12%5` or
+`12%%`. Loose mode is for copy-paste tolerance.
 
 ## Units
 
@@ -159,6 +161,8 @@ angle, force, torque, density, electric current, and electric potential.
 Unit values keep canonical decimal text plus a canonical unit code. Formatting,
 conversion, locale preference, and best-fit helpers validate that the value's
 dimension still matches the registered unit before using it.
+`parseUnit(text, { unit, dimension })` applies the same dimension check even
+when the text has no unit suffix and falls back to the explicit `unit` option.
 
 ## Phone
 

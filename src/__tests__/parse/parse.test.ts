@@ -101,10 +101,30 @@ describe("parsePercent", () => {
   it("parses locale percent placement into ratio values", () => {
     expect(parsePercent("%12,5", { locale: "tr-TR" }).value).toBe("0.125");
     expect(parsePercent("12.5%", { locale: "en-US" }).value).toBe("0.125");
+    expect(parsePercent("%12.5", { locale: "en-US" }).value).toBe("0.125");
+    expect(parsePercent("12,5 %", { locale: "de-DE" }).value).toBe("0.125");
     expect(parsePercent(`12,5\u00a0%`, { locale: "de-DE" }).value).toBe(
       "0.125",
     );
     expect(parsePercent("١٢٫٥٪؜", { locale: "ar-EG" }).value).toBe("0.125");
+  });
+
+  it("rejects misplaced or duplicate percent markers", () => {
+    expect(() => parsePercent("12%5", { locale: "en-US" })).toThrowError(
+      expect.objectContaining({
+        code: "INVALID_PERCENT",
+      }) as NumeratorError,
+    );
+    expect(() => parsePercent("12%%", { locale: "en-US" })).toThrowError(
+      expect.objectContaining({
+        code: "INVALID_PERCENT",
+      }) as NumeratorError,
+    );
+    expect(() => parsePercent("%12%", { locale: "tr-TR" })).toThrowError(
+      expect.objectContaining({
+        code: "INVALID_PERCENT",
+      }) as NumeratorError,
+    );
   });
 });
 
@@ -113,6 +133,16 @@ describe("parseUnit", () => {
     expect(parseUnit("12.5 km").unit).toBe("kilometer");
     expect(parseUnit("1,5 m²", { locale: "tr-TR" }).value).toBe("1.5");
     expect(parseUnit("1500", { unit: "square-meter" }).dimension).toBe("area");
+  });
+
+  it("validates explicit unit fallback against the expected dimension", () => {
+    expect(() =>
+      parseUnit("1500", { dimension: "length", unit: "kilogram" }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "INVALID_UNIT",
+      }) as NumeratorError,
+    );
   });
 });
 

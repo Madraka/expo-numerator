@@ -29,13 +29,19 @@
   props.
 - Renormalized scientific and engineering notation after coefficient rounding,
   preventing outputs such as `10.0E2` or `1000E3`.
+- Rejected misplaced or duplicate percent markers during percent parsing, so
+  malformed input such as `12%5` cannot be silently reinterpreted as a valid
+  percentage.
+- Applied unit dimension validation when `parseUnit` falls back to an explicit
+  `unit` option for suffixless text.
 
 ### 💡 Others
 
 - Expanded input replay, value-format smoke, unit registry smoke, focused Jest
   and deterministic property coverage, plus public docs for money/unit input
-  display policy, controlled input identity changes, scientific notation
-  rollover, and unit value boundary hardening.
+  display policy, controlled input identity changes, percent marker validation,
+  scientific notation rollover, unit parse fallback validation, and unit value
+  boundary hardening.
 
 ## 0.1.2 - 2026-05-10
 

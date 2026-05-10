@@ -117,6 +117,9 @@ describe("unit registry and measurement domain", () => {
     expect(() => parseUnit("12.5 kg", { dimension: "length" })).toThrow(
       "INVALID_UNIT",
     );
+    expect(() =>
+      parseUnit("1500", { dimension: "length", unit: "kilogram" }),
+    ).toThrow("INVALID_UNIT");
   });
 
   it("converts linear units without JavaScript number conversion", () => {

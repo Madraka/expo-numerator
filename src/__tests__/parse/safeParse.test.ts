@@ -54,6 +54,15 @@ describe("safe parse APIs", () => {
     }
   });
 
+  it("returns a typed failure for misplaced percent markers", () => {
+    const result = safeParsePercent("12%5", { locale: "en-US" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe("INVALID_PERCENT");
+    }
+  });
+
   it("routes unified safe parse requests by kind", () => {
     const numberResult = safeParse("1,234.5", { locale: "en-US" });
     const moneyResult = safeParse("$1,234.50", {

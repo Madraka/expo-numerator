@@ -16,6 +16,7 @@ function main() {
   const results = [
     ...checkValueInvariants(numerator),
     ...checkFormatMatrix(numerator),
+    ...checkParseMatrix(numerator),
     ...checkRoundtrips(numerator),
   ];
   const failures = results.filter((result) => !result.ok);
@@ -212,6 +213,44 @@ function checkFormatMatrix(numerator) {
   ];
 
   return runExpectations("format", expectations);
+}
+
+function checkParseMatrix(numerator) {
+  const expectations = [
+    [
+      "percent prefix fallback",
+      () =>
+        numerator.parsePercent("%12.5", { locale: "en-US" }).value === "0.125",
+    ],
+    [
+      "percent regular-space suffix fallback",
+      () =>
+        numerator.parsePercent("12,5 %", { locale: "de-DE" }).value ===
+        "0.125",
+    ],
+    [
+      "percent misplaced marker",
+      () => {
+        const result = numerator.safeParsePercent("12%5", {
+          locale: "en-US",
+        });
+
+        return !result.ok && result.error.code === "INVALID_PERCENT";
+      },
+    ],
+    [
+      "percent duplicate marker",
+      () => {
+        const result = numerator.safeParsePercent("12%%", {
+          locale: "en-US",
+        });
+
+        return !result.ok && result.error.code === "INVALID_PERCENT";
+      },
+    ],
+  ];
+
+  return runExpectations("parse", expectations);
 }
 
 function checkRoundtrips(numerator) {

@@ -159,6 +159,16 @@ function checkRuntimeSmokes(numerator) {
           }),
         ),
     ],
+    [
+      "parse unit fallback dimension guard",
+      () =>
+        throwsInvalidUnit(() =>
+          numerator.parseUnit("1500", {
+            dimension: "length",
+            unit: "kilogram",
+          }),
+        ),
+    ],
   ];
 
   for (const [label, assertion] of expectations) {
