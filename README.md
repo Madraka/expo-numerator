@@ -115,10 +115,10 @@ import { createExpoNumerator } from "expo-numerator/expo";
 
 ## Status
 
-`0.1.1` includes Foundation+Core, locale, format, parse alpha APIs, phone APIs,
+`0.1.3` includes Foundation+Core, locale, format, parse alpha APIs, phone APIs,
 React Native input APIs, Expo integration helpers, generated locale data,
-global generated phone metadata, domain subpath exports, package smoke checks,
-and release hardening.
+global generated phone metadata, domain subpath exports, a valid Expo config
+plugin entry, package smoke checks, and release hardening.
 
 ## Development
 

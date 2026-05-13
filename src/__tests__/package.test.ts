@@ -126,6 +126,13 @@ describe("public package surface", () => {
     expect(packageJson.exports["."].import).toBe("./build/esm/index.mjs");
     expect(packageJson.exports["."].require).toBe("./build/cjs/index.cjs");
     expect(packageJson.exports["."]["react-native"]).toBe("./src/index.ts");
+    expect(packageJson.exports["./app.plugin.js"]).toBe("./app.plugin.js");
+    expect(packageJson.exports["./plugin/withExpoNumerator"]).toBe(
+      "./plugin/withExpoNumerator.js",
+    );
+    expect(packageJson.exports["./plugin/withExpoNumerator.js"]).toBe(
+      "./plugin/withExpoNumerator.js",
+    );
     for (const subpath of [
       "core",
       "money",

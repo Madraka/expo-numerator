@@ -108,8 +108,9 @@ npm run example:expo-check
 
 ## Config Plugin
 
-The package includes a no-op Expo config plugin so apps can opt into plugin
-configuration without changing native behavior in the current release.
+The package exposes a valid Expo config plugin entry. It is intentionally a
+no-op today because the native module does not require permissions, plist
+values, manifest entries, or Gradle settings.
 
 ```json
 {
@@ -118,3 +119,8 @@ configuration without changing native behavior in the current release.
   }
 }
 ```
+
+Adding the plugin is safe for development builds and future native options.
+Native module availability still comes from Expo autolinking during prebuild or
+development-build compilation. Expo Go and unsupported runtimes keep using the
+crash-safe JavaScript fallback path.

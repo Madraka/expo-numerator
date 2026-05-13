@@ -36,6 +36,7 @@ function main() {
     smokeEsm(appRoot);
     smokeCjs(appRoot);
     smokeSubpaths(appRoot);
+    smokeConfigPlugin(appRoot);
     smokeBlockedInternals(appRoot);
     smokePackageMetadata(appRoot);
     smokePackageContents(appRoot);
@@ -122,6 +123,17 @@ function smokeSubpaths(appRoot) {
   );
 }
 
+function smokeConfigPlugin(appRoot) {
+  execFileSync(
+    process.execPath,
+    [
+      "--eval",
+      "const pluginPath = require.resolve('expo-numerator/app.plugin.js'); const directPluginPath = require.resolve('expo-numerator/plugin/withExpoNumerator'); const plugin = require(pluginPath); const directPlugin = require(directPluginPath); const config = { name: 'consumer-app' }; if (typeof plugin !== 'function' || typeof plugin.default !== 'function') throw new Error('config plugin export failed'); if (typeof directPlugin !== 'function' || typeof directPlugin.default !== 'function') throw new Error('direct config plugin export failed'); if (plugin(config) !== config) throw new Error('config plugin must preserve config');",
+    ],
+    { cwd: appRoot, stdio: "inherit" },
+  );
+}
+
 function smokePackageMetadata(appRoot) {
   execFileSync(
     process.execPath,
@@ -138,7 +150,7 @@ function smokePackageContents(appRoot) {
     process.execPath,
     [
       "--eval",
-      "const fs = require('node:fs'); const path = require('node:path'); const root = path.dirname(require.resolve('expo-numerator/package.json')); for (const file of ['build/index.d.ts','build/esm/index.mjs','build/cjs/index.cjs','build/money/index.d.ts','build/esm/money/index.mjs','build/cjs/money/index.cjs','build/phone/index.d.ts','build/esm/phone/index.mjs','build/cjs/phone/index.cjs','build/input/index.d.ts','build/esm/input/index.mjs','build/cjs/input/index.cjs','docs/CURRENCY_REGISTRY.md','docs/ERROR_CONTRACT.md','docs/INPUT_ACCEPTANCE.md','docs/ROADMAP.md','README.md','CHANGELOG.md','LICENSE']) { if (!fs.existsSync(path.join(root, file))) throw new Error(`missing packed file: ${file}`); } if (fs.existsSync(path.join(root, 'src/__tests__'))) throw new Error('tests must not be packed'); if (fs.existsSync(path.join(root, 'docs/private'))) throw new Error('private docs must not be packed'); if (fs.existsSync(path.join(root, 'docs/PHASE_PLAN.md'))) throw new Error('private phase plan must not be packed');",
+      "const fs = require('node:fs'); const path = require('node:path'); const root = path.dirname(require.resolve('expo-numerator/package.json')); for (const file of ['build/index.d.ts','build/esm/index.mjs','build/cjs/index.cjs','build/money/index.d.ts','build/esm/money/index.mjs','build/cjs/money/index.cjs','build/phone/index.d.ts','build/esm/phone/index.mjs','build/cjs/phone/index.cjs','build/input/index.d.ts','build/esm/input/index.mjs','build/cjs/input/index.cjs','app.plugin.js','plugin/withExpoNumerator.js','expo-module.config.json','android/build.gradle','android/src/main/AndroidManifest.xml','android/src/main/java/expo/modules/numerator/ExpoNumeratorModule.kt','ios/ExpoNumeratorModule.podspec','ios/ExpoNumeratorModule.swift','docs/CURRENCY_REGISTRY.md','docs/ERROR_CONTRACT.md','docs/INPUT_ACCEPTANCE.md','docs/ROADMAP.md','README.md','CHANGELOG.md','LICENSE']) { if (!fs.existsSync(path.join(root, file))) throw new Error(`missing packed file: ${file}`); } if (fs.existsSync(path.join(root, 'src/__tests__'))) throw new Error('tests must not be packed'); if (fs.existsSync(path.join(root, 'docs/private'))) throw new Error('private docs must not be packed'); if (fs.existsSync(path.join(root, 'docs/PHASE_PLAN.md'))) throw new Error('private phase plan must not be packed');",
     ],
     { cwd: appRoot, stdio: "inherit" },
   );

@@ -827,6 +827,18 @@ function checkPackageMetadata() {
     failures.push("react-native export condition must point at ./src/index.ts");
   }
 
+  const pluginExports = {
+    "./app.plugin.js": "./app.plugin.js",
+    "./plugin/withExpoNumerator": "./plugin/withExpoNumerator.js",
+    "./plugin/withExpoNumerator.js": "./plugin/withExpoNumerator.js",
+  };
+
+  for (const [exportKey, target] of Object.entries(pluginExports)) {
+    if (packageJson.exports?.[exportKey] !== target) {
+      failures.push(`${exportKey} export must point at ${target}`);
+    }
+  }
+
   for (const subpath of Object.keys(requiredSubpathRuntimeExports)) {
     const exportKey = `./${subpath}`;
     const entry = packageJson.exports?.[exportKey];

@@ -8,6 +8,16 @@
 
 ### 🐛 Bug fixes
 
+### 💡 Others
+
+## 0.1.3 - 2026-05-13
+
+### 🛠 Breaking changes
+
+### 🎉 New features
+
+### 🐛 Bug fixes
+
 - Kept `minorUnits` money entry tied to the currency registry minor-unit scale
   even when display fraction options are overridden.
 - Prevented unit input profiles from rendering whole measurement values as
@@ -34,6 +44,9 @@
   percentage.
 - Applied unit dimension validation when `parseUnit` falls back to an explicit
   `unit` option for suffixless text.
+- Exported `app.plugin.js` and the direct config-plugin subpath from the package
+  export map, so Expo apps can use `"plugins": ["expo-numerator"]` without the
+  resolver falling back to the root JavaScript API.
 
 ### 💡 Others
 
@@ -42,6 +55,8 @@
   display policy, controlled input identity changes, percent marker validation,
   scientific notation rollover, unit parse fallback validation, and unit value
   boundary hardening.
+- Added packed-package smoke and release-readiness checks for the config plugin,
+  native module files, and Expo module metadata.
 
 ## 0.1.2 - 2026-05-10
 
